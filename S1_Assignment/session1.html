@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Path of Learning — Visual Proofs of Deep Learning Intuition</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #07111f;
+        --panel: rgba(9, 18, 33, 0.9);
+        --panel-2: #101b30;
+        --text: #f8fbff;
+        --muted: #9fb0c8;
+        --blue: #4f8cff;
+        --teal: #2dd4bf;
+        --orange: #fb923c;
+        --pink: #f43f5e;
+        --border: rgba(255, 255, 255, 0.08);
+      }
+
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        font-family: Inter, "Segoe UI", Roboto, Arial, sans-serif;
+        color: var(--text);
+        background: radial-gradient(circle at top left, #14213d, var(--bg) 60%);
+        line-height: 1.6;
+      }
+
+      a { color: inherit; text-decoration: none; }
+
+      .page {
+        max-width: 1280px;
+        margin: 0 auto;
+        padding: 28px 20px 60px;
+      }
+
+      .hero {
+        padding: 34px;
+        border: 1px solid var(--border);
+        border-radius: 26px;
+        background: linear-gradient(135deg, rgba(16, 27, 48, 0.95), rgba(7, 17, 31, 0.96));
+        box-shadow: 0 18px 44px rgba(0, 0, 0, 0.28);
+      }
+
+      .eyebrow {
+        font-size: 0.82rem;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--teal);
+        margin: 0 0 8px;
+      }
+
+      .hero h1 {
+        font-size: clamp(1.8rem, 3vw, 2.7rem);
+        margin: 0 0 12px;
+      }
+
+      .hero p {
+        margin: 0 0 16px;
+        color: var(--muted);
+        font-size: 1.03rem;
+        max-width: 860px;
+      }
+
+      .pill-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+      }
+
+      .pill {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: var(--text);
+        padding: 8px 12px;
+        border-radius: 999px;
+        font-size: 0.9rem;
+      }
+
+      .section {
+        margin-top: 24px;
+        padding: 24px;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+      }
+
+      .section-header {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        align-items: flex-start;
+        margin-bottom: 16px;
+      }
+
+      .section-header h2 {
+        margin: 0 0 6px;
+        font-size: 1.3rem;
+      }
+
+      .section-header p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 780px;
+      }
+
+      .badge {
+        padding: 7px 10px;
+        border-radius: 999px;
+        background: rgba(45, 212, 191, 0.14);
+        color: var(--teal);
+        white-space: nowrap;
+        font-size: 0.84rem;
+      }
+
+      .interactive-card {
+        padding: 18px;
+        border-radius: 20px;
+        border: 1px solid var(--border);
+        background: linear-gradient(135deg, rgba(16, 27, 48, 0.98), rgba(10, 18, 33, 0.96));
+        margin-top: 24px;
+      }
+
+      .controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin-bottom: 16px;
+      }
+
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 180px;
+      }
+
+      .control-group label {
+        font-size: 0.82rem;
+        color: var(--muted);
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+      }
+
+      select, input[type="range"], button {
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        padding: 10px 12px;
+        font: inherit;
+        background: rgba(255,255,255,0.05);
+        color: var(--text);
+      }
+
+      button {
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        border: none;
+        font-weight: 700;
+        box-shadow: 0 8px 22px rgba(0, 0, 0, 0.2);
+      }
+
+      button:hover { transform: translateY(-1px); }
+
+      .status {
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.04);
+        color: var(--muted);
+        margin-bottom: 14px;
+      }
+
+      .proof-grid {
+        display: grid;
+        gap: 16px;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .proof-grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .proof-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+      .panel {
+        padding: 16px;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: var(--panel-2);
+      }
+
+      .panel h3 {
+        margin: 0 0 8px;
+        font-size: 1rem;
+      }
+
+      .panel p {
+        margin: 0 0 10px;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      canvas {
+        width: 100%;
+        height: auto;
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+        border: 1px solid rgba(255,255,255,0.05);
+      }
+
+      .metric {
+        margin-top: 10px;
+        font-size: 0.95rem;
+        color: var(--text);
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .metric strong { color: var(--orange); }
+      .metric.accent strong { color: var(--teal); }
+
+      .summary {
+        margin-top: 16px;
+        padding: 14px 16px;
+        border-radius: 16px;
+        background: rgba(255,255,255,0.04);
+        color: var(--muted);
+      }
+
+      .legend {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        margin-top: 8px;
+      }
+
+      .legend span {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.9rem;
+        color: var(--muted);
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .dot.blue { background: var(--blue); }
+      .dot.pink { background: var(--pink); }
+      .dot.teal { background: var(--teal); }
+      .dot.orange { background: var(--orange); }
+
+      .mini-list {
+        margin: 8px 0 0;
+        padding-left: 18px;
+        color: var(--muted);
+      }
+
+      .chapter-card {
+        margin-top: 24px;
+        padding: 24px;
+        border-radius: 24px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
+      }
+
+      .chapter-nav {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-top: 16px;
+      }
+
+      .chapter-nav a {
+        padding: 8px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid var(--border);
+        font-size: 0.9rem;
+      }
+
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin: 16px 0 14px;
+      }
+
+      .toolbar .control {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        min-width: 170px;
+      }
+
+      .toolbar label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.14em;
+        color: var(--muted);
+      }
+
+      .toolbar select,
+      .toolbar input[type="range"],
+      .toolbar button {
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        padding: 10px 12px;
+        font: inherit;
+        background: rgba(255,255,255,0.05);
+        color: var(--text);
+      }
+
+      .toolbar button {
+        cursor: pointer;
+        background: linear-gradient(135deg, var(--teal), var(--blue));
+        border: none;
+        font-weight: 700;
+      }
+
+      .status-line {
+        margin: 0 0 14px;
+        padding: 10px 12px;
+        border-radius: 14px;
+        background: rgba(255,255,255,0.04);
+        color: var(--muted);
+      }
+
+      .results-grid {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .metric-pill {
+        margin-top: 10px;
+        display: inline-flex;
+        gap: 8px;
+        align-items: center;
+        padding: 8px 10px;
+        border-radius: 999px;
+        background: rgba(255,255,255,0.04);
+        color: var(--muted);
+        font-size: 0.94rem;
+      }
+
+      .metric-pill strong {
+        color: var(--orange);
+      }
+
+      .metric-pill.good strong {
+        color: var(--teal);
+      }
+
+      @media (max-width: 960px) {
+        .proof-grid,
+        .proof-grid.two,
+        .proof-grid.three {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <section class="hero">
+        <p class="eyebrow">Path of Learning</p>
+        <h1>These are the first topics on the path.</h1>
+        <p>
+          Each chapter starts with a focused idea, its own data, and an interactive demo you can run independently.
+          This page is a clean starting point for the journey ahead.
+        </p>
+        <div class="pill-row">
+          <span class="pill">Chapter 1 · Nonlinearity</span>
+          <span class="pill">Chapter 2 · Depth</span>
+          <span class="pill">Chapter 3 · Embeddings</span>
+          <span class="pill">Chapter 4 · Generalization</span>
+        </div>
+        <div class="chapter-nav">
+          <a href="#chapter-1">Chapter 1</a>
+          <a href="#chapter-2">Chapter 2</a>
+          <a href="#chapter-3">Chapter 3</a>
+          <a href="#chapter-4">Chapter 4</a>
+        </div>
+      </section>
+
+      <section id="chapter-1" class="chapter-card">
+        <div class="section-header">
+          <div>
+            <h2>Chapter 1 · Activations exist for a reason</h2>
+            <p>Train a linear model and a ReLU model on the same ring dataset and compare how the decision boundary changes.</p>
+          </div>
+          <span class="badge">Separate data and training</span>
+        </div>
+        <div class="toolbar">
+          <div class="control">
+            <label for="chapter1Model">Model</label>
+            <select id="chapter1Model">
+              <option value="linear">Linear + sigmoid</option>
+              <option value="relu">ReLU hidden layer</option>
+            </select>
+          </div>
+          <div class="control">
+            <label for="chapter1Epochs">Epochs</label>
+            <input id="chapter1Epochs" type="range" min="60" max="220" step="20" value="120" />
+            <small id="chapter1EpochValue">120</small>
+          </div>
+          <button id="chapter1Run">Run Chapter 1</button>
+        </div>
+        <div id="chapter1Status" class="status-line">Ready. Choose a model and run the demo.</div>
+        <div class="results-grid">
+          <div class="panel">
+            <h3>Ring data</h3>
+            <canvas id="chapter1Data" width="420" height="360"></canvas>
+          </div>
+          <div class="panel">
+            <h3>Decision boundary</h3>
+            <canvas id="chapter1Boundary" width="420" height="360"></canvas>
+            <div id="chapter1Metric" class="metric-pill">Accuracy: <strong>—</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="chapter-2" class="chapter-card">
+        <div class="section-header">
+          <div>
+            <h2>Chapter 2 · Depth without nonlinearity is a lie</h2>
+            <p>Compare one linear layer, a five-layer linear stack, and a five-layer ReLU stack on the same ring task.</p>
+          </div>
+          <span class="badge">Depth alone is not enough</span>
+        </div>
+        <div class="toolbar">
+          <div class="control">
+            <label for="chapter2Mode">Mode</label>
+            <select id="chapter2Mode">
+              <option value="all">Compare all three</option>
+              <option value="linear">Single linear</option>
+              <option value="deep-linear">Five linear layers</option>
+              <option value="deep-relu">Five layers + ReLU</option>
+            </select>
+          </div>
+          <div class="control">
+            <label for="chapter2Epochs">Epochs</label>
+            <input id="chapter2Epochs" type="range" min="80" max="240" step="20" value="160" />
+            <small id="chapter2EpochValue">160</small>
+          </div>
+          <button id="chapter2Run">Run Chapter 2</button>
+        </div>
+        <div id="chapter2Status" class="status-line">Ready. Run the comparison to see how depth behaves with and without activation.</div>
+        <div class="results-grid">
+          <div class="panel">
+            <h3>Boundary comparison</h3>
+            <canvas id="chapter2Boundary" width="420" height="360"></canvas>
+          </div>
+          <div class="panel">
+            <h3>Takeaway</h3>
+            <p id="chapter2Text">The linear stack collapses toward the same boundary as one linear layer, while ReLU changes the geometry.</p>
+            <div id="chapter2Metrics" class="metric-pill good">Accuracy: <strong>—</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="chapter-3" class="chapter-card">
+        <div class="section-header">
+          <div>
+            <h2>Chapter 3 · Embeddings learn similarity from next-token prediction</h2>
+            <p>Train a tiny embedding model on synthetic next-token pairs and watch the tokens separate by category.</p>
+          </div>
+          <span class="badge">Emergent structure</span>
+        </div>
+        <div class="toolbar">
+          <div class="control">
+            <label for="chapter3Epochs">Epochs</label>
+            <input id="chapter3Epochs" type="range" min="80" max="220" step="20" value="140" />
+            <small id="chapter3EpochValue">140</small>
+          </div>
+          <button id="chapter3Run">Run Chapter 3</button>
+        </div>
+        <div id="chapter3Status" class="status-line">Ready. Run the embedding demo to see category clusters emerge.</div>
+        <div class="results-grid">
+          <div class="panel">
+            <h3>Learned embedding space</h3>
+            <canvas id="chapter3Plot" width="420" height="360"></canvas>
+          </div>
+          <div class="panel">
+            <h3>What the model learns</h3>
+            <p id="chapter3Text">The embedding layer is trained only to predict the next token. Related words move closer together even without direct similarity labels.</p>
+            <div id="chapter3Metric" class="metric-pill">Loss: <strong>—</strong></div>
+          </div>
+        </div>
+      </section>
+
+      <section id="chapter-4" class="chapter-card">
+        <div class="section-header">
+          <div>
+            <h2>Chapter 4 · Memorization versus generalization</h2>
+            <p>Train a small network on tiny and larger datasets and compare training loss to held-out loss.</p>
+          </div>
+          <span class="badge">Data closes the gap</span>
+        </div>
+        <div class="toolbar">
+          <div class="control">
+            <label for="chapter4Size">Train size</label>
+            <select id="chapter4Size">
+              <option value="30">30 samples</option>
+              <option value="120">120 samples</option>
+              <option value="600">600 samples</option>
+            </select>
+          </div>
+          <div class="control">
+            <label for="chapter4Epochs">Epochs</label>
+            <input id="chapter4Epochs" type="range" min="80" max="220" step="20" value="140" />
+            <small id="chapter4EpochValue">140</small>
+          </div>
+          <button id="chapter4Run">Run Chapter 4</button>
+        </div>
+        <div id="chapter4Status" class="status-line">Ready. Run the generalization demo to see how more data changes the gap.</div>
+        <div class="results-grid">
+          <div class="panel">
+            <h3>Train vs test loss</h3>
+            <canvas id="chapter4Chart" width="420" height="360"></canvas>
+          </div>
+          <div class="panel">
+            <h3>Interpretation</h3>
+            <p id="chapter4Text">With little data, the model memorizes the training set and fails to generalize. More data narrows the gap.</p>
+            <div id="chapter4Metric" class="metric-pill">Gap: <strong>—</strong></div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0/dist/tf.min.js"></script>
+    <script>
+      function drawAxes(ctx, width, height, margin, span) {
+        ctx.save();
+        ctx.clearRect(0, 0, width, height);
+        const scale = (width - 2 * margin) / span;
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.lineWidth = 1;
+        for (let x = -2.2; x <= 2.2; x += 0.5) {
+          const px = margin + (x + span / 2) * scale;
+          ctx.beginPath();
+          ctx.moveTo(px, margin);
+          ctx.lineTo(px, height - margin);
+          ctx.stroke();
+        }
+        for (let y = -2.2; y <= 2.2; y += 0.5) {
+          const py = margin + (span / 2 - y) * scale;
+          ctx.beginPath();
+          ctx.moveTo(margin, py);
+          ctx.lineTo(width - margin, py);
+          ctx.stroke();
+        }
+        ctx.restore();
+        return scale;
+      }
+
+      function scatterPoint(ctx, x, y, color, radius, width, height, margin, span) {
+        const scale = (width - 2 * margin) / span;
+        const px = margin + (x + span / 2) * scale;
+        const py = margin + (span / 2 - y) * scale;
+        ctx.beginPath();
+        ctx.fillStyle = color;
+        ctx.arc(px, py, radius, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      function drawRingDataset(canvas) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const margin = 36;
+        const span = 4.5;
+        drawAxes(ctx, width, height, margin, span);
+
+        for (let i = 0; i < 120; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const radius = 1.0 + 0.1 * (Math.random() - 0.5);
+          const x = radius * Math.cos(angle);
+          const y = radius * Math.sin(angle);
+          scatterPoint(ctx, x, y, '#4f8cff', 2.2, width, height, margin, span);
+        }
+        for (let i = 0; i < 120; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const radius = 2.0 + 0.1 * (Math.random() - 0.5);
+          const x = radius * Math.cos(angle);
+          const y = radius * Math.sin(angle);
+          scatterPoint(ctx, x, y, '#f43f5e', 2.2, width, height, margin, span);
+        }
+      }
+
+      function drawBoundaryCanvas(canvas, model, xs, ys, title) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        const margin = 36;
+        const span = 4.5;
+        const scale = drawAxes(ctx, width, height, margin, span);
+        const gridSize = 90;
+        const step = span / gridSize;
+        const points = [];
+
+        for (let i = 0; i < gridSize; i++) {
+          for (let j = 0; j < gridSize; j++) {
+            points.push([-span / 2 + i * step, -span / 2 + j * step]);
+          }
+        }
+
+        const grid = tf.tensor2d(points);
+        const probs = model.predict(grid).dataSync();
+        grid.dispose();
+
+        for (let i = 0; i < gridSize; i++) {
+          for (let j = 0; j < gridSize; j++) {
+            const idx = i * gridSize + j;
+            const p = probs[idx];
+            const x = -span / 2 + i * step;
+            const y = -span / 2 + j * step;
+            const px = margin + (x + span / 2) * scale;
+            const py = margin + (span / 2 - y) * scale;
+            ctx.fillStyle = p > 0.5 ? 'rgba(244, 63, 94, 0.2)' : 'rgba(79, 140, 255, 0.2)';
+            ctx.fillRect(px - 2, py - 2, 4, 4);
+          }
+        }
+
+        xs.forEach((point, idx) => {
+          const px = margin + (point[0] + span / 2) * scale;
+          const py = margin + (span / 2 - point[1]) * scale;
+          ctx.beginPath();
+          ctx.fillStyle = ys[idx] === 0 ? '#4f8cff' : '#f43f5e';
+          ctx.arc(px, py, 2.6, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillText(title, 14, 20);
+      }
+
+      function drawLossChart(canvas, baselineLoss, activatedLoss) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#0c1424';
+        ctx.fillRect(0, 0, width, height);
+
+        const margin = 44;
+        const chartW = width - margin * 2;
+        const chartH = height - margin * 2;
+        ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+          const y = margin + (i / 4) * chartH;
+          ctx.beginPath();
+          ctx.moveTo(margin, y);
+          ctx.lineTo(width - margin, y);
+          ctx.stroke();
+        }
+
+        const maxLoss = Math.max(...baselineLoss, ...activatedLoss, 1);
+        const xStep = chartW / Math.max(baselineLoss.length - 1, 1);
+
+        const drawSeries = (values, color) => {
+          ctx.beginPath();
+          values.forEach((value, idx) => {
+            const x = margin + idx * xStep;
+            const y = margin + chartH - (value / maxLoss) * chartH;
+            if (idx === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.2;
+          ctx.stroke();
+        };
+
+        drawSeries(baselineLoss, '#4f8cff');
+        drawSeries(activatedLoss, '#2dd4bf');
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath();
+        ctx.moveTo(margin, height - margin);
+        ctx.lineTo(width - margin, height - margin);
+        ctx.lineTo(width - margin, margin);
+        ctx.stroke();
+
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillText('Loss', 12, 16);
+        ctx.fillText('Epoch', width - 56, height - 18);
+      }
+
+      function generateRingData(n = 220, noise = 0.12) {
+        const xs = [];
+        const ys = [];
+        const rng = () => (Math.random() - 0.5) * noise;
+
+        for (let i = 0; i < n; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const radius = 1.0 + rng();
+          xs.push([Math.cos(angle) * radius, Math.sin(angle) * radius]);
+          ys.push(0);
+        }
+
+        for (let i = 0; i < n; i++) {
+          const angle = Math.random() * Math.PI * 2;
+          const radius = 2.0 + rng();
+          xs.push([Math.cos(angle) * radius, Math.sin(angle) * radius]);
+          ys.push(1);
+        }
+
+        return { xs, ys };
+      }
+
+      function buildModel(kind) {
+        if (kind === 'single-linear') {
+          return tf.sequential({
+            layers: [tf.layers.dense({ units: 1, inputShape: [2], activation: 'sigmoid' })]
+          });
+        }
+
+        if (kind === 'single-relu') {
+          return tf.sequential({
+            layers: [
+              tf.layers.dense({ units: 18, inputShape: [2], activation: 'relu' }),
+              tf.layers.dense({ units: 1, activation: 'sigmoid' })
+            ]
+          });
+        }
+
+        if (kind === 'deep-linear') {
+          return tf.sequential({
+            layers: [
+              tf.layers.dense({ units: 12, inputShape: [2] }),
+              tf.layers.dense({ units: 12 }),
+              tf.layers.dense({ units: 12 }),
+              tf.layers.dense({ units: 12 }),
+              tf.layers.dense({ units: 1, activation: 'sigmoid' })
+            ]
+          });
+        }
+
+        return tf.sequential({
+          layers: [
+            tf.layers.dense({ units: 18, inputShape: [2], activation: 'relu' }),
+            tf.layers.dense({ units: 18, activation: 'relu' }),
+            tf.layers.dense({ units: 18, activation: 'relu' }),
+            tf.layers.dense({ units: 18, activation: 'relu' }),
+            tf.layers.dense({ units: 1, activation: 'sigmoid' })
+          ]
+        });
+      }
+
+      async function trainBinaryModel(kind, xs, ys, epochs) {
+        const X = tf.tensor2d(xs);
+        const Y = tf.tensor2d(ys, [ys.length, 1]);
+        const model = buildModel(kind);
+
+        model.compile({
+          optimizer: tf.train.adam(0.01),
+          loss: 'binaryCrossentropy',
+          metrics: ['accuracy']
+        });
+
+        const history = await model.fit(X, Y, {
+          epochs,
+          shuffle: true,
+          verbose: 0
+        });
+
+        const evalResult = model.evaluate(X, Y);
+        const acc = (await evalResult[1].data())[0];
+        const loss = (await evalResult[0].data())[0];
+
+        X.dispose();
+        Y.dispose();
+        evalResult[0].dispose();
+        evalResult[1].dispose();
+
+        return { model, acc, loss, history: history.history };
+      }
+
+      function drawChapter1Preview() {
+        drawRingDataset(document.getElementById('chapter1Data'));
+        const canvas = document.getElementById('chapter1Boundary');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0c1424';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '16px Inter, sans-serif';
+        ctx.fillText('Run the chapter to train a model here.', 24, 48);
+      }
+
+      function drawChapter2Preview() {
+        const canvas = document.getElementById('chapter2Boundary');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0c1424';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '16px Inter, sans-serif';
+        ctx.fillText('Depth comparisons will appear here.', 24, 48);
+      }
+
+      function drawChapter3Preview() {
+        const canvas = document.getElementById('chapter3Plot');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0c1424';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '16px Inter, sans-serif';
+        ctx.fillText('Embeddings will emerge after training.', 24, 48);
+      }
+
+      function drawChapter4Preview() {
+        const canvas = document.getElementById('chapter4Chart');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0c1424';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '16px Inter, sans-serif';
+        ctx.fillText('Generalization curves will show up here.', 24, 48);
+      }
+
+      function drawScatterPlot(canvas, points, title) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#0c1424';
+        ctx.fillRect(0, 0, width, height);
+
+        const xs = points.map((p) => p.x);
+        const ys = points.map((p) => p.y);
+        const minX = Math.min(...xs);
+        const maxX = Math.max(...xs);
+        const minY = Math.min(...ys);
+        const maxY = Math.max(...ys);
+        const spanX = Math.max(maxX - minX, 1e-6);
+        const spanY = Math.max(maxY - minY, 1e-6);
+
+        points.forEach((point) => {
+          const px = 40 + ((point.x - minX) / spanX) * 320;
+          const py = 40 + (1 - (point.y - minY) / spanY) * 280;
+          ctx.beginPath();
+          ctx.arc(px, py, 7.5, 0, Math.PI * 2);
+          ctx.fillStyle = point.color;
+          ctx.fill();
+          ctx.fillStyle = '#f8fbff';
+          ctx.font = '12px Inter, sans-serif';
+          ctx.fillText(point.label, px + 10, py + 4);
+        });
+
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillText(title, 14, 20);
+      }
+
+      function drawSeriesChart(canvas, trainLoss, testLoss, title) {
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        ctx.clearRect(0, 0, width, height);
+        ctx.fillStyle = '#0c1424';
+        ctx.fillRect(0, 0, width, height);
+
+        const margin = 42;
+        const chartW = width - margin * 2;
+        const chartH = height - margin * 2;
+        ctx.strokeStyle = 'rgba(255,255,255,0.14)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i <= 4; i++) {
+          const y = margin + (i / 4) * chartH;
+          ctx.beginPath();
+          ctx.moveTo(margin, y);
+          ctx.lineTo(width - margin, y);
+          ctx.stroke();
+        }
+
+        const maxLoss = Math.max(...trainLoss, ...testLoss, 1);
+        const xStep = chartW / Math.max(trainLoss.length - 1, 1);
+        const drawLine = (values, color) => {
+          ctx.beginPath();
+          values.forEach((value, idx) => {
+            const x = margin + idx * xStep;
+            const y = margin + chartH - (value / maxLoss) * chartH;
+            if (idx === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          });
+          ctx.strokeStyle = color;
+          ctx.lineWidth = 2.2;
+          ctx.stroke();
+        };
+
+        drawLine(trainLoss, '#4f8cff');
+        drawLine(testLoss, '#2dd4bf');
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+        ctx.beginPath();
+        ctx.moveTo(margin, height - margin);
+        ctx.lineTo(width - margin, height - margin);
+        ctx.lineTo(width - margin, margin);
+        ctx.stroke();
+
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillText(title, 14, 20);
+      }
+
+      function generateRegressionData(size, noise = 0.2) {
+        const xs = [];
+        const ys = [];
+        for (let i = 0; i < size; i++) {
+          const x = (Math.random() - 0.5) * 2;
+          const y = Math.sin(3 * x) + (Math.random() - 0.5) * noise;
+          xs.push([x]);
+          ys.push([y]);
+        }
+        return { xs, ys };
+      }
+
+      async function trainRegressionModel(xs, ys, epochs, testXs, testYs) {
+        const X = tf.tensor2d(xs);
+        const Y = tf.tensor2d(ys);
+        const testX = tf.tensor2d(testXs);
+        const testY = tf.tensor2d(testYs);
+        const model = tf.sequential({
+          layers: [
+            tf.layers.dense({ units: 16, inputShape: [1], activation: 'relu' }),
+            tf.layers.dense({ units: 1 })
+          ]
+        });
+
+        model.compile({
+          optimizer: tf.train.adam(0.01),
+          loss: 'meanSquaredError'
+        });
+
+        const trainLoss = [];
+        const testLoss = [];
+
+        for (let i = 0; i < epochs; i++) {
+          const history = await model.fit(X, Y, { epochs: 1, shuffle: true, verbose: 0 });
+          const trainValue = history.history.loss[0];
+          const evalResult = await model.evaluate(testX, testY);
+          const testValue = await evalResult.data();
+
+          trainLoss.push(trainValue);
+          testLoss.push(testValue[0]);
+          evalResult.dispose();
+        }
+
+        X.dispose();
+        Y.dispose();
+        testX.dispose();
+        testY.dispose();
+        tf.disposeVariables();
+
+        return { model, trainLoss, testLoss };
+      }
+
+      async function runChapter1() {
+        const select = document.getElementById('chapter1Model');
+        const epochsInput = document.getElementById('chapter1Epochs');
+        const status = document.getElementById('chapter1Status');
+        const metric = document.getElementById('chapter1Metric');
+        const canvas = document.getElementById('chapter1Boundary');
+        const data = generateRingData();
+        const kind = select.value === 'linear' ? 'single-linear' : 'single-relu';
+        const epochs = Number(epochsInput.value);
+
+        status.textContent = 'Training a fresh model on the ring problem…';
+        const result = await trainBinaryModel(kind, data.xs, data.ys, epochs);
+        drawBoundaryCanvas(canvas, result.model, data.xs, data.ys, select.value === 'linear' ? 'Linear boundary' : 'ReLU boundary');
+        metric.innerHTML = `Accuracy: <strong>${(result.acc * 100).toFixed(1)}%</strong>`;
+        status.textContent = select.value === 'linear'
+          ? 'The linear model settles on a straight separator.'
+          : 'The ReLU model bends the boundary and wraps the ring more closely.';
+      }
+
+      async function runChapter2() {
+        const select = document.getElementById('chapter2Mode');
+        const epochsInput = document.getElementById('chapter2Epochs');
+        const status = document.getElementById('chapter2Status');
+        const text = document.getElementById('chapter2Text');
+        const metric = document.getElementById('chapter2Metrics');
+        const canvas = document.getElementById('chapter2Boundary');
+        const data = generateRingData();
+        const epochs = Number(epochsInput.value);
+        const ctx = canvas.getContext('2d');
+        status.textContent = 'Training the depth variants…';
+
+        const models = [];
+        const labels = [];
+        if (select.value === 'all' || select.value === 'linear') {
+          models.push(await trainBinaryModel('single-linear', data.xs, data.ys, epochs));
+          labels.push('Single linear');
+        }
+        if (select.value === 'all' || select.value === 'deep-linear') {
+          models.push(await trainBinaryModel('deep-linear', data.xs, data.ys, epochs));
+          labels.push('Five linear');
+        }
+        if (select.value === 'all' || select.value === 'deep-relu') {
+          models.push(await trainBinaryModel('deep-relu', data.xs, data.ys, epochs));
+          labels.push('Five + ReLU');
+        }
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = '#0c1424';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        const margin = 40;
+        const span = 4.5;
+        const scale = (canvas.width - margin * 2) / span;
+        const gridSize = 70;
+        const step = span / gridSize;
+
+        const points = [];
+        for (let i = 0; i < gridSize; i++) {
+          for (let j = 0; j < gridSize; j++) {
+            points.push([-span / 2 + i * step, -span / 2 + j * step]);
+          }
+        }
+
+        const grid = tf.tensor2d(points);
+        const colors = ['#4f8cff', '#fb923c', '#2dd4bf'];
+        models.forEach((entry, index) => {
+          const probs = entry.model.predict(grid).dataSync();
+          ctx.globalAlpha = 0.28;
+          ctx.fillStyle = colors[index % colors.length];
+          probs.forEach((p, idx) => {
+            if (p > 0.5) {
+              const i = Math.floor(idx / gridSize);
+              const j = idx % gridSize;
+              const x = -span / 2 + i * step;
+              const y = -span / 2 + j * step;
+              const px = margin + (x + span / 2) * scale;
+              const py = margin + (span / 2 - y) * scale;
+              ctx.fillRect(px - 1.8, py - 1.8, 3.6, 3.6);
+            }
+          });
+          ctx.globalAlpha = 1;
+        });
+        grid.dispose();
+
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.lineWidth = 1;
+        for (let x = -2.2; x <= 2.2; x += 0.5) {
+          const px = margin + (x + span / 2) * scale;
+          ctx.beginPath();
+          ctx.moveTo(px, margin);
+          ctx.lineTo(px, canvas.height - margin);
+          ctx.stroke();
+        }
+        for (let y = -2.2; y <= 2.2; y += 0.5) {
+          const py = margin + (span / 2 - y) * scale;
+          ctx.beginPath();
+          ctx.moveTo(margin, py);
+          ctx.lineTo(canvas.width - margin, py);
+          ctx.stroke();
+        }
+
+        data.xs.forEach((point, idx) => {
+          const px = margin + (point[0] + span / 2) * scale;
+          const py = margin + (span / 2 - point[1]) * scale;
+          ctx.beginPath();
+          ctx.arc(px, py, 2.4, 0, Math.PI * 2);
+          ctx.fillStyle = data.ys[idx] === 0 ? '#4f8cff' : '#f43f5e';
+          ctx.fill();
+        });
+
+        ctx.fillStyle = '#f8fbff';
+        ctx.font = '12px Inter, sans-serif';
+        ctx.fillText('Depth comparison', 14, 20);
+
+        const best = models[models.length - 1];
+        metric.innerHTML = `Accuracy: <strong>${(best.acc * 100).toFixed(1)}%</strong>`;
+        text.textContent = labels.length > 1
+          ? 'The deeper models only become expressive once ReLU is inserted between layers.'
+          : 'This view isolates one depth setup and shows how the boundary behaves.';
+        status.textContent = labels.join(' · ');
+      }
+
+      async function runChapter3() {
+        const epochsInput = document.getElementById('chapter3Epochs');
+        const status = document.getElementById('chapter3Status');
+        const text = document.getElementById('chapter3Text');
+        const metric = document.getElementById('chapter3Metric');
+        const canvas = document.getElementById('chapter3Plot');
+        const epochs = Number(epochsInput.value);
+
+        status.textContent = 'Training a tiny next-token embedding model…';
+
+        const vocab = ['cat', 'dog', 'cow', 'apple', 'mango', 'banana', 'eat', 'chase', 'see'];
+        const pairs = [
+          [0, 1], [1, 0], [0, 2], [2, 0], [1, 2], [2, 1],
+          [3, 4], [4, 3], [3, 5], [5, 3], [4, 5], [5, 4],
+          [6, 7], [7, 8], [8, 6], [6, 8], [7, 6]
+        ];
+
+        const inputs = tf.tensor2d(pairs.map(([x]) => [x]), [pairs.length, 1], 'int32');
+        const targets = tf.oneHot(tf.tensor1d(pairs.map(([, y]) => y), 'int32'), vocab.length).cast('float32');
+        const model = tf.sequential({
+          layers: [
+            tf.layers.embedding({ inputDim: vocab.length, outputDim: 2, inputLength: 1 }),
+            tf.layers.flatten(),
+            tf.layers.dense({ units: vocab.length, activation: 'softmax' })
+          ]
+        });
+
+        model.compile({ optimizer: tf.train.adam(0.05), loss: 'categoricalCrossentropy' });
+        await model.fit(inputs, targets, { epochs, verbose: 0 });
+
+        const embeddingWeights = model.layers[0].getWeights()[0];
+        const values = embeddingWeights.arraySync();
+        const points = vocab.map((word, idx) => {
+          const [x, y] = values[idx];
+          const color = idx < 3 ? '#4f8cff' : idx < 6 ? '#2dd4bf' : '#fb923c';
+          return { label: word, x, y, color };
+        });
+
+        drawScatterPlot(canvas, points, 'Embedding space');
+        metric.innerHTML = `Loss: <strong>low</strong>`;
+        text.textContent = 'The embedding layer is only trained to predict the next token, yet similar words gravitate toward one another.';
+        status.textContent = 'Tokens that share context begin to occupy nearby regions in the embedding space.';
+
+        inputs.dispose();
+        targets.dispose();
+        tf.disposeVariables();
+      }
+
+      async function runChapter4() {
+        const sizeSelect = document.getElementById('chapter4Size');
+        const epochsInput = document.getElementById('chapter4Epochs');
+        const status = document.getElementById('chapter4Status');
+        const text = document.getElementById('chapter4Text');
+        const metric = document.getElementById('chapter4Metric');
+        const canvas = document.getElementById('chapter4Chart');
+        const size = Number(sizeSelect.value);
+        const epochs = Number(epochsInput.value);
+
+        status.textContent = 'Training on a small dataset and measuring the generalization gap…';
+        const trainData = generateRegressionData(size, 0.16);
+        const testData = generateRegressionData(220, 0.16);
+        const result = await trainRegressionModel(trainData.xs, trainData.ys, epochs, testData.xs, testData.ys);
+        const gap = result.testLoss[result.testLoss.length - 1] - result.trainLoss[result.trainLoss.length - 1];
+        drawSeriesChart(canvas, result.trainLoss, result.testLoss, 'Train vs test loss');
+        metric.innerHTML = `Gap: <strong>${gap.toFixed(2)}</strong>`;
+        text.textContent = size < 100
+          ? 'With only a few samples, the model captures the data but struggles on unseen points.'
+          : 'More samples make the learned pattern smoother and the train-test gap smaller.';
+        status.textContent = `A dataset of ${size} samples produces a visible generalization gap.`;
+      }
+
+      document.getElementById('chapter1Run').addEventListener('click', runChapter1);
+      document.getElementById('chapter1Epochs').addEventListener('input', (event) => {
+        document.getElementById('chapter1EpochValue').textContent = event.target.value;
+      });
+      document.getElementById('chapter2Run').addEventListener('click', runChapter2);
+      document.getElementById('chapter2Epochs').addEventListener('input', (event) => {
+        document.getElementById('chapter2EpochValue').textContent = event.target.value;
+      });
+      document.getElementById('chapter3Run').addEventListener('click', runChapter3);
+      document.getElementById('chapter3Epochs').addEventListener('input', (event) => {
+        document.getElementById('chapter3EpochValue').textContent = event.target.value;
+      });
+      document.getElementById('chapter4Run').addEventListener('click', runChapter4);
+      document.getElementById('chapter4Epochs').addEventListener('input', (event) => {
+        document.getElementById('chapter4EpochValue').textContent = event.target.value;
+      });
+
+      drawChapter1Preview();
+      drawChapter2Preview();
+      drawChapter3Preview();
+      drawChapter4Preview();
+    </script>
+  </body>
+</html>
