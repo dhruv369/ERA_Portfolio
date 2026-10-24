@@ -23,9 +23,9 @@ def main() -> None:
     )
     parser.add_argument(
         "--experiment",
-        choices=("A", "B"),
+        choices=("A", "B", "C"),
         default="A",
-        help="Training strategy: A uses all articles; B balances word counts.",
+        help="Training strategy: A uses all articles; B balances words; C balances characters.",
     )
     args = parser.parse_args()
 

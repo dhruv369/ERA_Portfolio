@@ -54,24 +54,45 @@ def load_training_texts(experiment: str) -> list[str]:
 
     if experiment == "A":
         return [texts_by_language[language] for language in LANGUAGE_ORDER]
-    if experiment != "B":
+    if experiment not in {"B", "C"}:
         raise ValueError(f"Unknown experiment: {experiment}")
 
     word_lists = {
         language: texts_by_language[language].split()
         for language in LANGUAGE_ORDER
     }
-    target_word_count = max(len(words) for words in word_lists.values())
+    if experiment == "B":
+        target_word_count = max(len(words) for words in word_lists.values())
+    else:
+        target_character_count = max(
+            len(texts_by_language[language]) for language in LANGUAGE_ORDER
+        )
+
     balanced_texts = []
     for index, language in enumerate(LANGUAGE_ORDER):
         words = word_lists[language]
         rng = random.Random(RANDOM_SEED + index)
-        extra_words = rng.choices(words, k=target_word_count - len(words))
-        balanced_texts.append(" ".join(words + extra_words))
-        print(
-            f"{language}: training with {target_word_count:,} words "
-            f"({len(words):,} original, {len(extra_words):,} sampled)"
-        )
+        if experiment == "B":
+            extra_words = rng.choices(words, k=target_word_count - len(words))
+            training_text = " ".join(words + extra_words)
+            print(
+                f"{language}: training with {target_word_count:,} words "
+                f"({len(words):,} original, {len(extra_words):,} sampled)"
+            )
+        else:
+            extra_words = []
+            character_count = len(texts_by_language[language])
+            while character_count < target_character_count:
+                sampled_word = rng.choice(words)
+                extra_words.append(sampled_word)
+                character_count += len(sampled_word) + 1
+            training_text = " ".join(words + extra_words)
+            print(
+                f"{language}: training with {len(training_text):,} characters "
+                f"({len(texts_by_language[language]):,} original, "
+                f"{len(extra_words):,} sampled words)"
+            )
+        balanced_texts.append(training_text)
 
     return balanced_texts
 
@@ -109,7 +130,7 @@ def train(experiment: str) -> Path:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Train a shared BPE tokenizer.")
-    parser.add_argument("--experiment", choices=("A", "B"), default="A")
+    parser.add_argument("--experiment", choices=("A", "B", "C"), default="A")
     args = parser.parse_args()
     train(args.experiment)
 

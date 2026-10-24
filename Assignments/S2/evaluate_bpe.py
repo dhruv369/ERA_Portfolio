@@ -114,7 +114,7 @@ def evaluate(experiment: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate an experiment tokenizer.")
-    parser.add_argument("--experiment", choices=("A", "B"), default="A")
+    parser.add_argument("--experiment", choices=("A", "B", "C"), default="A")
     args = parser.parse_args()
     evaluate(args.experiment)
 
