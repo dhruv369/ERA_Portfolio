@@ -21,6 +21,12 @@ def main() -> None:
         action="store_true",
         help="Download the latest Wikipedia articles before running the pipeline.",
     )
+    parser.add_argument(
+        "--experiment",
+        choices=("A", "B"),
+        default="A",
+        help="Training strategy: A uses all articles; B balances word counts.",
+    )
     args = parser.parse_args()
 
     if args.refresh or not DATA_PATH.exists():
@@ -32,11 +38,11 @@ def main() -> None:
     print("\nStep 2/4: Cleaning article text")
     clean_articles.main()
 
-    print("\nStep 3/4: Training the shared BPE tokenizer")
-    train_bpe.main()
+    print(f"\nStep 3/4: Training Experiment {args.experiment}")
+    train_bpe.train(args.experiment)
 
-    print("\nStep 4/4: Evaluating tokenization")
-    evaluate_bpe.main()
+    print(f"\nStep 4/4: Evaluating Experiment {args.experiment}")
+    evaluate_bpe.evaluate(args.experiment)
 
 
 if __name__ == "__main__":

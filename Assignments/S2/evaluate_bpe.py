@@ -1,5 +1,6 @@
 """Evaluate the shared BPE tokenizer on each cleaned language article."""
 
+import argparse
 import json
 from pathlib import Path
 from typing import Any
@@ -8,7 +9,7 @@ from tokenizers import Tokenizer
 
 
 DATA_PATH = Path(__file__).resolve().parent / "data" / "cleaned_articles.json"
-TOKENIZER_PATH = Path(__file__).resolve().parent / "tokenizer.json"
+TOKENIZER_DIR = Path(__file__).resolve().parent
 EXPECTED_LANGUAGES = {"en", "hi", "te", "ta"}
 EXPECTED_VOCAB_SIZE = 10_000
 
@@ -52,8 +53,9 @@ def load_articles() -> list[dict[str, str]]:
     return articles
 
 
-def main() -> None:
-    tokenizer = Tokenizer.from_file(str(TOKENIZER_PATH))
+def evaluate(experiment: str) -> None:
+    tokenizer_path = TOKENIZER_DIR / f"tokenizer_{experiment}.json"
+    tokenizer = Tokenizer.from_file(str(tokenizer_path))
     vocab_size = tokenizer.get_vocab_size(with_added_tokens=True)
     if vocab_size != EXPECTED_VOCAB_SIZE:
         raise ValueError(
@@ -66,8 +68,9 @@ def main() -> None:
         if not words:
             raise ValueError(f"Article has no words: {article['language']}")
 
-        token_count = len(tokenizer.encode(article["text"]).ids)
-        unique_word_count = len(set(words))
+        unique_words = set(words)
+        token_count = sum(len(tokenizer.encode(word).ids) for word in unique_words)
+        unique_word_count = len(unique_words)
         ratio = token_count / unique_word_count
         results.append(
             {
@@ -86,10 +89,14 @@ def main() -> None:
         raise ValueError("The score is undefined because all language ratios are equal")
     score = 1000 / ratio_gap
 
+    print(f"Experiment: {experiment}")
     print(f"Tokenizer vocabulary: {vocab_size:,} entries")
-    print("Unique words: distinct whitespace-separated forms; case and punctuation kept.")
+    print(
+        "Each distinct whitespace-separated form is encoded once; "
+        "case and punctuation are kept."
+    )
     print()
-    print(f"{'Language':<10} {'Tokens':>10} {'Unique words':>14} {'X_i':>10}")
+    print(f"{'Language':<10} {'Unique-word tokens':>19} {'Unique words':>14} {'X_i':>10}")
     for result in results:
         print(
             f"{result['language_name']:<10} "
@@ -103,6 +110,13 @@ def main() -> None:
         f"= {ratio_gap:.4f}"
     )
     print(f"Score: 1000 / {ratio_gap:.4f} = {score:.2f}")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description="Evaluate an experiment tokenizer.")
+    parser.add_argument("--experiment", choices=("A", "B"), default="A")
+    args = parser.parse_args()
+    evaluate(args.experiment)
 
 
 if __name__ == "__main__":
