@@ -4,15 +4,19 @@
 
 Build a Byte Pair Encoding (BPE) tokenizer with one shared vocabulary of 10,000 tokens for the English, Hindi, Telugu, and Tamil versions of Wikipedia's India article.
 
-## Prepare the articles
+## Run the full pipeline
 
-Run `python Assignments/S2/fetch_articles.py` to collect the corresponding India articles from Wikidata and Wikipedia. The script saves their plain text, page URLs, and revision IDs to `Assignments/S2/data/articles.json`. This downloaded corpus is local and ignored by Git.
+Install the dependency with `python -m pip install -r requirements.txt`, then run:
 
-Run `python Assignments/S2/clean_articles.py` to create `Assignments/S2/data/cleaned_articles.json` without changing the raw download. It normalizes Unicode, removes the heading markers present in the plaintext extracts, and collapses duplicate whitespace. Wikipedia already provides plaintext with markup and references removed; bracketed text is preserved because it can contain useful linguistic information.
+```bash
+python Assignments/S2/main.py
+```
 
-## Compare
+The pipeline downloads the four corresponding India articles if they are not already saved, cleans the text, trains the shared tokenizer, and evaluates it. It reuses saved articles by default so the results stay reproducible. To deliberately download the latest article versions and rerun every step, use `python Assignments/S2/main.py --refresh`.
 
-Run `python Assignments/S2/evaluate_bpe.py` to evaluate the trained tokenizer. For each article, the script counts tokenizer IDs and unique whitespace-separated word forms; word forms are case-sensitive and punctuation is kept.
+The raw and cleaned article files are saved under `Assignments/S2/data/` and ignored by Git. Wikipedia's API provides plaintext with markup and references removed; cleaning additionally normalizes Unicode, removes plaintext heading markers, and collapses duplicate whitespace. Bracketed text is preserved.
+
+## Evaluation
 
 **Xᵢ = token count / unique word count**
 
@@ -28,10 +32,6 @@ Run `python Assignments/S2/evaluate_bpe.py` to evaluate the trained tokenizer. F
 **Ratio gap = 13.1975 - 3.3715 = 9.8260**  
 **Score = 1000 / 9.8260 = 101.77**
 
-## Train the shared tokenizer
-
-Install the dependency with `python -m pip install -r requirements.txt`, then run `python Assignments/S2/train_bpe.py`. This trains one byte-level BPE tokenizer using all four cleaned articles. Its vocabulary has exactly 10,000 entries, including three reserved special tokens: `<|pad|>`, `<|bos|>`, and `<|eos|>`.
-
-The complete tokenizer—including its vocabulary, merge rules, and configuration—is saved as `Assignments/S2/tokenizer.json`. The raw and cleaned article text remains in the ignored `data/` directory. The three special tokens are included in the 10,000-entry limit.
+The tokenizer is byte-level BPE trained on all four cleaned articles. Its vocabulary contains exactly 10,000 entries, including `<|pad|>`, `<|bos|>`, and `<|eos|>`. The complete tokenizer—including its vocabulary, merge rules, and configuration—is saved as `Assignments/S2/tokenizer.json`.
 
 **Status:** Articles collected, normalized, tokenized, and evaluated. The score is a baseline for this single-article-per-language experiment.
