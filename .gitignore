@@ -1,0 +1,11 @@
+# macOS Finder metadata
+.DS_Store
+
+# Python bytecode and virtual environments
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Generated experiment output
+flower_regression_comparison.png
