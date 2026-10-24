@@ -27,4 +27,4 @@ Tools and concepts used so far:
 ## Learning journey
 
 - **Session 1:** Built experiments around core deep learning ideas. See the [session notes](./Assignments/S1/S1_readme.md) for what was tried and learned.
-- **Session 2:** Compared baseline, word-balanced, and character-balanced training for a shared 10,000-entry BPE tokenizer. Character balancing scored marginally highest so far. See the [session notes](./Assignments/S2/S2_readme.md).
+- **Session 2:** Compared baseline, word-balanced, character-balanced, and weighted training for a shared 10,000-entry BPE tokenizer. The best tested weights scored marginally highest. See the [session notes](./Assignments/S2/S2_readme.md).

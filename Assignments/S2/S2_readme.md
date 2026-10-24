@@ -18,7 +18,9 @@ Run `python Assignments/S2/main.py --experiment B` to train with equal word coun
 
 Run `python Assignments/S2/main.py --experiment C` to balance training by character count. Here, a character is one Unicode code point in Python's `len()`; each full article is kept and sampled whole words are added to shorter texts until they reach or slightly exceed the longest article's character count.
 
-Both experiments use the same full cleaned articles for evaluation.
+Run `python Assignments/S2/main.py --experiment D` to search language-specific integer weights. Each weight repeats that language's full article in the training input; the script evaluates a fixed candidate set and saves the tokenizer with the best measured score.
+
+All experiments use the same full cleaned articles for evaluation.
 
 The raw and cleaned article files are saved under `Assignments/S2/data/` and ignored by Git. Wikipedia's API provides plaintext with markup and references removed; cleaning additionally normalizes Unicode, removes plaintext heading markers, and collapses duplicate whitespace. Bracketed text is preserved.
 
@@ -37,7 +39,7 @@ Keep the same four cleaned articles for every evaluation. Only change how the sh
 | A | Train on all four articles together | Baseline | Complete |
 | B | Oversample shorter articles to the longest word count | Reduce article-length bias | Complete |
 | C | Oversample shorter articles to the longest character count | Compare script-sensitive effects | Complete |
-| D | Tune language sampling weights | Reduce the ratio spread | Planned |
+| D | Search language-specific article repetition weights | Reduce the ratio spread | Complete |
 
 Do not assume balanced sampling produces balanced tokenization ratios. Select the strategy with the smallest measured ratio gap.
 
@@ -89,6 +91,34 @@ Characters are Unicode code points. Training texts were balanced to approximatel
 
 Experiment C currently has the smallest spread and highest score, but its improvement over A is very small.
 
-Each tokenizer is byte-level BPE with exactly 10,000 entries, including `<|pad|>`, `<|bos|>`, and `<|eos|>`. Experiment artifacts are saved separately as `Assignments/S2/tokenizer_A.json`, `Assignments/S2/tokenizer_B.json`, and `Assignments/S2/tokenizer_C.json`.
+#### Experiment D: language-specific sampling weights
 
-**Status:** Experiments A, B, and C are complete. Experiment D remains planned.
+The search tested integer repetition weights in English:Hindi:Telugu:Tamil order. Each candidate used the same 10,000-entry vocabulary budget and the fixed evaluation set.
+
+| Weights | D | Score |
+| --- | ---: | ---: |
+| 1:1:1:1 | 4.8540 | 206.02 |
+| 1:1:1:2 | 4.8525 | 206.08 |
+| 1:1:2:2 | 4.8503 | 206.17 |
+| 1:2:2:2 | 4.8518 | 206.11 |
+| 1:2:3:4 | 4.8462 | 206.35 |
+| 1:2:3:6 | 4.8402 | 206.60 |
+| **1:2:4:6** | **4.8380** | **206.70** |
+
+Best-candidate results:
+
+| Language | Tokens for unique forms | Unique forms | Xᵢ |
+| --- | ---: | ---: | ---: |
+| English | 13,579 | 4,641 | 2.9259 |
+| Hindi | 11,684 | 2,409 | 4.8501 |
+| Telugu | 10,649 | 1,648 | 6.4618 |
+| Tamil | 39,231 | 5,053 | 7.7639 |
+
+**D = 7.7639 - 2.9259 = 4.8380**  
+**Score = 1000 / 4.8380 = 206.70**
+
+This search improved the score slightly over Experiment C's 206.04. The best weights are only the best among these seven candidates, not a global optimum.
+
+Each tokenizer is byte-level BPE with exactly 10,000 entries, including `<|pad|>`, `<|bos|>`, and `<|eos|>`. Experiment artifacts are saved separately as `Assignments/S2/tokenizer_A.json`, `Assignments/S2/tokenizer_B.json`, `Assignments/S2/tokenizer_C.json`, and `Assignments/S2/tokenizer_D.json`.
+
+**Status:** Experiments A, B, C, and D are complete. D's best result is from a limited candidate search.

@@ -23,9 +23,9 @@ def main() -> None:
     )
     parser.add_argument(
         "--experiment",
-        choices=("A", "B", "C"),
+        choices=("A", "B", "C", "D"),
         default="A",
-        help="Training strategy: A uses all articles; B balances words; C balances characters.",
+        help="Training strategy: A baseline; B word-balanced; C character-balanced; D weighted search.",
     )
     args = parser.parse_args()
 
@@ -39,7 +39,10 @@ def main() -> None:
     clean_articles.main()
 
     print(f"\nStep 3/4: Training Experiment {args.experiment}")
-    train_bpe.train(args.experiment)
+    if args.experiment == "D":
+        train_bpe.run_weight_search()
+    else:
+        train_bpe.train(args.experiment)
 
     print(f"\nStep 4/4: Evaluating Experiment {args.experiment}")
     evaluate_bpe.evaluate(args.experiment)

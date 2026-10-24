@@ -56,6 +56,11 @@ def load_articles() -> list[dict[str, str]]:
 def evaluate(experiment: str) -> None:
     tokenizer_path = TOKENIZER_DIR / f"tokenizer_{experiment}.json"
     tokenizer = Tokenizer.from_file(str(tokenizer_path))
+    results, ratio_gap, score = measure(tokenizer)
+    print_results(experiment, tokenizer, results, ratio_gap, score)
+
+
+def measure(tokenizer: Tokenizer) -> tuple[list[dict[str, Any]], float, float]:
     vocab_size = tokenizer.get_vocab_size(with_added_tokens=True)
     if vocab_size != EXPECTED_VOCAB_SIZE:
         raise ValueError(
@@ -88,7 +93,19 @@ def evaluate(experiment: str) -> None:
     if ratio_gap == 0:
         raise ValueError("The score is undefined because all language ratios are equal")
     score = 1000 / ratio_gap
+    return results, ratio_gap, score
 
+
+def print_results(
+    experiment: str,
+    tokenizer: Tokenizer,
+    results: list[dict[str, Any]],
+    ratio_gap: float,
+    score: float,
+) -> None:
+    vocab_size = tokenizer.get_vocab_size(with_added_tokens=True)
+    lowest = min(results, key=lambda result: result["ratio"])
+    highest = max(results, key=lambda result: result["ratio"])
     print(f"Experiment: {experiment}")
     print(f"Tokenizer vocabulary: {vocab_size:,} entries")
     print(
@@ -114,7 +131,7 @@ def evaluate(experiment: str) -> None:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate an experiment tokenizer.")
-    parser.add_argument("--experiment", choices=("A", "B", "C"), default="A")
+    parser.add_argument("--experiment", choices=("A", "B", "C", "D"), default="A")
     args = parser.parse_args()
     evaluate(args.experiment)
 
