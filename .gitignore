@@ -9,3 +9,6 @@ venv/
 
 # Generated experiment output
 flower_regression_comparison.png
+
+# Downloaded Wikipedia article corpus
+Assignments/S2/data/

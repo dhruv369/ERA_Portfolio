@@ -7,14 +7,14 @@ I learn by building small projects that make the ideas visible and testable. Eac
 
 ## Featured project
 
-[Session 2: A multilingual BPE tokenizer](./Assignments/S2/S2_readme.md) will explore how one shared vocabulary tokenizes the India article across four languages.
+[Session 2: A multilingual BPE tokenizer](./Assignments/S2/S2_readme.md) will explore how one shared vocabulary tokenizes the India article in English, Hindi, Telugu, and Tamil.
 
 ## All assignments
 
 | Assignment | Project | Status |
 | --- | --- | --- |
 | 01 | [Deep learning fundamentals](./Assignments/S1/S1_readme.md) | Done |
-| 02 | [A multilingual BPE tokenizer](./Assignments/S2/S2_readme.md) | Planning |
+| 02 | [A multilingual BPE tokenizer](./Assignments/S2/S2_readme.md) | In progress |
 
 ## Technical skills
 
@@ -27,4 +27,4 @@ Tools and concepts used in the completed session:
 ## Learning journey
 
 - **Session 1:** Built experiments around core deep learning ideas. See the [session notes](./Assignments/S1/S1_readme.md) for what was tried and learned.
-- **Session 2:** Plan to compare how a shared BPE vocabulary tokenizes English, Hindi, Telugu, and Bengali. See the [session notes](./Assignments/S2/S2_readme.md).
+- **Session 2:** Collected the English, Hindi, Telugu, and Tamil India articles for a shared-vocabulary BPE experiment. See the [session notes](./Assignments/S2/S2_readme.md).
