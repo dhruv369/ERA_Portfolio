@@ -7,7 +7,7 @@ I learn by building small projects that make the ideas visible and testable. Eac
 
 ## Featured project
 
-[Session 2: A multilingual BPE tokenizer](./Assignments/S2/S2_readme.md) compares one shared vocabulary across the English, Hindi, Telugu, and Tamil India articles.
+[Session 2: A multilingual BPE tokenizer](./Assignments/S2/S2_readme.md) compares one shared vocabulary across the English, Hindi, Telugu, and Tamil India articles. [View the live results widget](https://tokenizerexperiment.netlify.app/) or [open its source](./Assignments/S2/widget/index.html).
 
 ## All assignments
 

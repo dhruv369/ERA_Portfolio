@@ -1,0 +1,52 @@
+{
+  "experiment": "D",
+  "training_weights": "1:2:4:6 (English:Hindi:Telugu:Tamil)",
+  "vocabulary_size": 10000,
+  "special_tokens": [
+    "<|pad|>",
+    "<|bos|>",
+    "<|eos|>"
+  ],
+  "word_counting_rule": "Split cleaned article text on whitespace; retain case and punctuation; encode each distinct form once.",
+  "score_formula": "1000 / (max(X_i) - min(X_i))",
+  "ratio_gap": 4.8380245885746405,
+  "score": 206.69593171592706,
+  "languages": [
+    {
+      "language": "en",
+      "language_name": "English",
+      "token_count": 13579,
+      "unique_word_count": 4641,
+      "ratio": 2.925878043525102,
+      "page_url": "https://en.wikipedia.org/wiki/India",
+      "revision_id": 1381725259
+    },
+    {
+      "language": "hi",
+      "language_name": "Hindi",
+      "token_count": 11684,
+      "unique_word_count": 2409,
+      "ratio": 4.850145288501453,
+      "page_url": "https://hi.wikipedia.org/wiki/%E0%A4%AD%E0%A4%BE%E0%A4%B0%E0%A4%A4",
+      "revision_id": 6631096
+    },
+    {
+      "language": "te",
+      "language_name": "Telugu",
+      "token_count": 10649,
+      "unique_word_count": 1648,
+      "ratio": 6.461771844660194,
+      "page_url": "https://te.wikipedia.org/wiki/%E0%B0%AD%E0%B0%BE%E0%B0%B0%E0%B0%A4%E0%B0%A6%E0%B1%87%E0%B0%B6%E0%B0%82",
+      "revision_id": 4848340
+    },
+    {
+      "language": "ta",
+      "language_name": "Tamil",
+      "token_count": 39231,
+      "unique_word_count": 5053,
+      "ratio": 7.763902632099743,
+      "page_url": "https://ta.wikipedia.org/wiki/%E0%AE%87%E0%AE%A8%E0%AF%8D%E0%AE%A4%E0%AE%BF%E0%AE%AF%E0%AE%BE",
+      "revision_id": 4663096
+    }
+  ]
+}

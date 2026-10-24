@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Results and downloadable vocabulary for a shared multilingual BPE tokenizer experiment.">
+    <title>Multilingual BPE — Experiment D</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17221f;
+        --muted: #5d6d65;
+        --paper: #f6f5ef;
+        --card: #fffef9;
+        --line: #dce2d8;
+        --green: #195d48;
+        --lime: #c4ed8b;
+        --orange: #f3a66b;
+      }
+
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(ellipse at 85% 0%, #e1edcf 0, transparent 34rem),
+          var(--paper);
+        color: var(--ink);
+        font: 16px/1.55 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+
+      main { width: min(1080px, calc(100% - 32px)); margin: 0 auto; padding: 46px 0 64px; }
+      .eyebrow { color: var(--green); font-size: .78rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+      h1 { max-width: 760px; margin: 12px 0; font-size: clamp(2.25rem, 6vw, 4.8rem); line-height: .99; letter-spacing: -.055em; }
+      h2 { margin: 0 0 12px; font-size: 1.2rem; }
+      p { color: var(--muted); }
+      .intro { max-width: 700px; margin: 0; font-size: 1.1rem; }
+      .hero { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding: 30px 0 36px; }
+      .score-card { flex: 0 0 220px; padding: 20px; border-radius: 18px; background: var(--green); color: white; }
+      .score-card small { display: block; color: #cce6d8; }
+      .score-card strong { display: block; margin: 2px 0; font-size: 3rem; line-height: 1.1; }
+      .score-card span { color: #dcefe4; font-size: .9rem; }
+      .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin: 10px 0 24px; }
+      .stat, .panel { border: 1px solid var(--line); border-radius: 16px; background: var(--card); }
+      .stat { padding: 17px 18px; }
+      .stat span { display: block; color: var(--muted); font-size: .85rem; }
+      .stat strong { display: block; margin-top: 4px; font-size: 1.5rem; }
+      .panel { padding: 22px; margin-top: 16px; }
+      .panel-heading { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+      .panel-heading p { margin: 0; font-size: .88rem; }
+      .table-wrap { overflow-x: auto; }
+      table { width: 100%; border-collapse: collapse; min-width: 610px; }
+      th, td { padding: 13px 10px; border-bottom: 1px solid var(--line); text-align: right; white-space: nowrap; }
+      th { color: var(--muted); font-size: .78rem; font-weight: 700; }
+      th:first-child, td:first-child { text-align: left; }
+      tbody tr:last-child td { border-bottom: 0; }
+      .ratio-cell { min-width: 170px; }
+      .bar-track { height: 6px; margin-top: 6px; overflow: hidden; border-radius: 999px; background: #e8ece4; }
+      .bar { height: 100%; border-radius: inherit; background: var(--green); }
+      .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+      .button {
+        display: inline-flex; align-items: center; justify-content: center;
+        min-height: 44px; padding: 10px 16px; border: 1px solid var(--green);
+        border-radius: 10px; background: var(--green); color: white;
+        font: inherit; font-weight: 700; text-decoration: none;
+      }
+      .button.secondary { background: transparent; color: var(--green); }
+      .button:hover { filter: brightness(1.08); }
+      .formula { padding: 14px; border-radius: 10px; background: #eef2e7; color: var(--ink); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+      .method, footer { font-size: .9rem; }
+      .method strong { color: var(--ink); }
+      .notice { padding: 13px 15px; border-left: 4px solid var(--orange); background: #fff4e8; color: #684329; }
+      .error { padding: 14px; border: 1px solid #b42318; border-radius: 10px; background: #fff1f0; color: #8b1d15; }
+      footer { padding-top: 22px; color: var(--muted); }
+      a.source { color: var(--green); }
+
+      @media (max-width: 680px) {
+        main { width: min(100% - 22px, 1080px); padding-top: 25px; }
+        .hero { align-items: stretch; flex-direction: column; }
+        .score-card { flex-basis: auto; }
+        .grid { grid-template-columns: 1fr; }
+        .panel { padding: 17px 13px; }
+        .panel-heading { align-items: start; flex-direction: column; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header class="hero">
+        <div>
+          <div class="eyebrow">Tokenizer experiment · Strategy D</div>
+          <h1>One vocabulary.<br>Four languages.</h1>
+          <p class="intro">A shared byte-level BPE tokenizer trained on the India articles in English, Hindi, Telugu, and Tamil. The score compares subword splitting across each article’s unique word forms.</p>
+        </div>
+        <aside class="score-card" aria-label="Experiment score">
+          <small>Self-score</small>
+          <strong id="score">Loading</strong>
+          <span id="score-caption">1000 / spread</span>
+        </aside>
+      </header>
+
+      <section class="grid" aria-label="Experiment summary">
+        <article class="stat"><span>Vocabulary entries</span><strong id="vocab-size">Loading</strong></article>
+        <article class="stat"><span>Ratio spread (D)</span><strong id="spread">Loading</strong></article>
+        <article class="stat"><span>Sampling weights · EN:HI:TE:TA</span><strong id="weights">Loading</strong></article>
+      </section>
+
+      <section class="panel">
+        <div class="panel-heading">
+          <h2>Evaluation results</h2>
+          <p>Same fixed evaluation articles for all experiments</p>
+        </div>
+        <div id="results" class="table-wrap" aria-live="polite">Loading verified results…</div>
+        <p class="formula" id="calculation">Loading calculation…</p>
+        <p class="method" id="method"></p>
+        <p class="notice">This score is a self-reported experimental result, not an independently verified grade. The tokenizer and evaluation method are downloadable so the result can be reproduced.</p>
+      </section>
+
+      <section class="panel">
+        <h2>Download and reproduce</h2>
+        <p>Download the full tokenizer configuration or the complete token vocabulary with token IDs. The vocabulary file lists one JSON-quoted token per line in ID order.</p>
+        <div class="actions">
+          <a class="button" href="tokenizer_D.json" download="tokenizer_D.json">Download tokenizer JSON</a>
+          <a class="button secondary" href="tokenizer-vocab.tsv" download="tokenizer_D-vocab.tsv">Download all tokens</a>
+          <a class="button secondary" href="results.json" download="experiment-D-results.json">Download results and sources</a>
+        </div>
+        <p id="sources" class="method"></p>
+      </section>
+
+      <footer>
+        Session 2 · Multilingual BPE · <a class="source" href="../S2_readme.md">Experiment notes and full methodology</a>
+      </footer>
+    </main>
+    <script>
+      const formatNumber = (value) => new Intl.NumberFormat("en-US").format(value);
+      const formatRatio = (value) => Number(value).toFixed(4);
+
+      async function renderResults() {
+        const target = document.querySelector("#results");
+        try {
+          const response = await fetch("results.json");
+          if (!response.ok) {
+            throw new Error(`Could not load results.json (HTTP ${response.status})`);
+          }
+          const data = await response.json();
+          if (!Array.isArray(data.languages) || data.languages.length !== 4) {
+            throw new Error("Results must contain all four evaluated languages.");
+          }
+
+          document.querySelector("#score").textContent = Number(data.score).toFixed(2);
+          document.querySelector("#score-caption").textContent =
+            `1000 / ${Number(data.ratio_gap).toFixed(4)}`;
+          document.querySelector("#vocab-size").textContent =
+            formatNumber(data.vocabulary_size);
+          document.querySelector("#spread").textContent =
+            Number(data.ratio_gap).toFixed(4);
+          document.querySelector("#weights").textContent =
+            data.training_weights.split(" ")[0];
+          document.querySelector("#calculation").textContent =
+            `D = ${formatRatio(Math.max(...data.languages.map((item) => item.ratio)))} − ` +
+            `${formatRatio(Math.min(...data.languages.map((item) => item.ratio)))} = ` +
+            `${formatRatio(data.ratio_gap)}   ·   Score = 1000 / ${formatRatio(data.ratio_gap)} = ` +
+            `${Number(data.score).toFixed(2)}`;
+          document.querySelector("#method").textContent = data.word_counting_rule;
+
+          const table = document.createElement("table");
+          table.innerHTML =
+            "<thead><tr><th>Language</th><th>Unique-word tokens</th>" +
+            "<th>Unique forms</th><th>Xᵢ</th></tr></thead>";
+          const body = document.createElement("tbody");
+          for (const item of data.languages) {
+            const row = document.createElement("tr");
+            const language = document.createElement("td");
+            const source = document.createElement("a");
+            source.href = item.page_url;
+            source.className = "source";
+            source.textContent = item.language_name;
+            source.title = `Wikipedia revision ${item.revision_id}`;
+            language.append(source);
+
+            const tokens = document.createElement("td");
+            tokens.textContent = formatNumber(item.token_count);
+            const unique = document.createElement("td");
+            unique.textContent = formatNumber(item.unique_word_count);
+
+            const ratio = document.createElement("td");
+            ratio.className = "ratio-cell";
+            ratio.append(document.createTextNode(formatRatio(item.ratio)));
+            const track = document.createElement("div");
+            track.className = "bar-track";
+            const bar = document.createElement("div");
+            bar.className = "bar";
+            bar.style.width =
+              `${(item.ratio / Math.max(...data.languages.map((language) => language.ratio))) * 100}%`;
+            track.append(bar);
+            ratio.append(track);
+
+            row.append(language, tokens, unique, ratio);
+            body.append(row);
+          }
+          table.append(body);
+          target.replaceChildren(table);
+          document.querySelector("#sources").textContent =
+            "Source revisions: " +
+            data.languages.map((item) => `${item.language_name} r${item.revision_id}`).join(" · ") +
+            ". The downloadable results include each revision and page URL.";
+        } catch (error) {
+          target.innerHTML = "";
+          const message = document.createElement("p");
+          message.className = "error";
+          message.textContent = `Results could not be loaded: ${error.message}`;
+          target.append(message);
+        }
+      }
+
+      renderResults();
+    </script>
+  </body>
+</html>

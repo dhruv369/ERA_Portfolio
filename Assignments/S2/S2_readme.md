@@ -4,6 +4,18 @@
 
 Build a Byte Pair Encoding (BPE) tokenizer with one shared vocabulary of 10,000 tokens for the English, Hindi, Telugu, and Tamil versions of Wikipedia's India article.
 
+## Results widget
+
+The static widget displays the latest verified Experiment D measurements and provides downloads for the full tokenizer, its complete ID-ordered vocabulary, and the metric/source data:
+
+- [Open the live widget](https://tokenizerexperiment.netlify.app/)
+- [Open the local widget source](./widget/index.html)
+- [Download the complete Experiment D tokenizer](./widget/tokenizer_D.json)
+- [Download the 10,000-token vocabulary](./widget/tokenizer-vocab.tsv)
+- [Download the widget results data](./widget/results.json)
+
+Regenerate the widget data after changing the tokenizer or evaluation inputs with `python Assignments/S2/generate_widget_data.py`. The widget is configured for Netlify with the repository-root `netlify.toml`.
+
 ## Run the full pipeline
 
 Install the dependency with `python -m pip install -r requirements.txt`, then run:
@@ -117,7 +129,7 @@ Best-candidate results:
 **D = 7.7639 - 2.9259 = 4.8380**  
 **Score = 1000 / 4.8380 = 206.70**
 
-This search improved the score slightly over Experiment C's 206.04. The best weights are only the best among these seven candidates, not a global optimum.
+The best weights in the current saved Experiment D artifact are 1:2:4:6. This improves slightly on Experiment C (206.04); the best weights are only the best among the seven candidates tested, not a global optimum.
 
 Each tokenizer is byte-level BPE with exactly 10,000 entries, including `<|pad|>`, `<|bos|>`, and `<|eos|>`. Experiment artifacts are saved separately as `Assignments/S2/tokenizer_A.json`, `Assignments/S2/tokenizer_B.json`, `Assignments/S2/tokenizer_C.json`, and `Assignments/S2/tokenizer_D.json`.
 
