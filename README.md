@@ -27,4 +27,4 @@ Tools and concepts used so far:
 ## Learning journey
 
 - **Session 1:** Built experiments around core deep learning ideas. See the [session notes](./Assignments/S1/S1_readme.md) for what was tried and learned.
-- **Session 2:** Collected the four India articles and trained a shared 10,000-entry byte-level BPE tokenizer. Comparing tokenization ratios is next; see the [session notes](./Assignments/S2/S2_readme.md).
+- **Session 2:** Collected the four India articles, trained a shared 10,000-entry byte-level BPE tokenizer, and recorded baseline tokenization ratios. See the [session notes](./Assignments/S2/S2_readme.md).

@@ -12,11 +12,21 @@ Run `python Assignments/S2/clean_articles.py` to create `Assignments/S2/data/cle
 
 ## Compare
 
-Next, define one consistent word-counting rule for all four languages. Encode each cleaned article with the shared tokenizer and compare its token count with its word count:
+Run `python Assignments/S2/evaluate_bpe.py` to evaluate the trained tokenizer. For each article, the script counts tokenizer IDs and unique whitespace-separated word forms; word forms are case-sensitive and punctuation is kept.
 
-**Tokenization ratio = token count / word count**
+**Xᵢ = token count / unique word count**
 
-Compare the four ratios and aim to reduce the difference between the highest and lowest. The assignment score is **1000 / (highest ratio - lowest ratio)**, so a smaller gap gives a higher score.
+### Results
+
+| Language | Token count | Unique word count | Xᵢ |
+| --- | ---: | ---: | ---: |
+| English | 15,647 | 4,641 | 3.3715 |
+| Hindi | 29,248 | 2,409 | 12.1411 |
+| Telugu | 14,115 | 1,648 | 8.5649 |
+| Tamil | 66,687 | 5,053 | 13.1975 |
+
+**Ratio gap = 13.1975 - 3.3715 = 9.8260**  
+**Score = 1000 / 9.8260 = 101.77**
 
 ## Train the shared tokenizer
 
@@ -24,4 +34,4 @@ Install the dependency with `python -m pip install -r requirements.txt`, then ru
 
 The complete tokenizer—including its vocabulary, merge rules, and configuration—is saved as `Assignments/S2/tokenizer.json`. The raw and cleaned article text remains in the ignored `data/` directory. The three special tokens are included in the 10,000-entry limit.
 
-**Status:** Articles collected and normalized; shared 10,000-entry tokenizer trained. Tokenization-ratio comparison is next.
+**Status:** Articles collected, normalized, tokenized, and evaluated. The score is a baseline for this single-article-per-language experiment.
