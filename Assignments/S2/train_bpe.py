@@ -6,7 +6,15 @@ import random
 from pathlib import Path
 from typing import Any
 
-from tokenizers import Tokenizer, decoders, models, normalizers, pre_tokenizers, trainers
+from tokenizers import (
+    AddedToken,
+    Tokenizer,
+    decoders,
+    models,
+    normalizers,
+    pre_tokenizers,
+    trainers,
+)
 
 import evaluate_bpe
 
@@ -122,22 +130,87 @@ def train(experiment: str) -> Path:
 
 
 def train_tokenizer(training_texts: list[str]) -> Tokenizer:
+    return _train_tokenizer(training_texts, VOCAB_SIZE)
+
+
+def train_tokenizer_with_reserved_indic_tokens(
+    training_texts: list[str],
+    candidates_by_language: dict[str, list[str]],
+    reserved_token_count: int,
+) -> tuple[Tokenizer, dict[str, int]]:
+    if reserved_token_count <= 0 or reserved_token_count >= VOCAB_SIZE:
+        raise ValueError(
+            f"Reserved token count must be between 1 and {VOCAB_SIZE - 1}"
+        )
+    if not candidates_by_language:
+        raise ValueError("At least one Indic language candidate list is required")
+
+    languages = tuple(candidates_by_language)
+    base_quota, remainder = divmod(reserved_token_count, len(languages))
+    quotas = {
+        language: base_quota + int(index < remainder)
+        for index, language in enumerate(languages)
+    }
+    tokenizer = _train_tokenizer(training_texts, VOCAB_SIZE - reserved_token_count)
+    existing_tokens = tokenizer.get_vocab()
+    reserved_tokens: list[AddedToken] = []
+    reserved_counts: dict[str, int] = {}
+    reserved_values: set[str] = set()
+
+    for language, candidates in candidates_by_language.items():
+        selected: list[str] = []
+        if quotas[language] == 0:
+            reserved_counts[language] = 0
+            continue
+        for candidate in candidates:
+            if candidate not in existing_tokens and candidate not in reserved_values:
+                selected.append(candidate)
+                reserved_values.add(candidate)
+                if len(selected) == quotas[language]:
+                    break
+        if len(selected) != quotas[language]:
+            raise RuntimeError(
+                f"Not enough unused Indic candidates for {language}: "
+                f"needed {quotas[language]}, found {len(selected)}"
+            )
+        reserved_tokens.extend(
+            AddedToken(token, normalized=True, special=False) for token in selected
+        )
+        reserved_counts[language] = len(selected)
+
+    added_count = tokenizer.add_tokens(reserved_tokens)
+    if added_count != reserved_token_count:
+        raise RuntimeError(
+            f"Expected to add {reserved_token_count} reserved Indic tokens, "
+            f"but added {added_count}"
+        )
+
+    actual_vocab_size = tokenizer.get_vocab_size(with_added_tokens=True)
+    if actual_vocab_size != VOCAB_SIZE:
+        raise RuntimeError(
+            f"Expected exactly {VOCAB_SIZE} vocabulary entries, "
+            f"but training produced {actual_vocab_size}"
+        )
+    return tokenizer, reserved_counts
+
+
+def _train_tokenizer(training_texts: list[str], vocab_size: int) -> Tokenizer:
     tokenizer = Tokenizer(models.BPE())
     tokenizer.normalizer = normalizers.NFC()
     tokenizer.pre_tokenizer = pre_tokenizers.ByteLevel(add_prefix_space=False)
     tokenizer.decoder = decoders.ByteLevel()
 
     trainer = trainers.BpeTrainer(
-        vocab_size=VOCAB_SIZE,
+        vocab_size=vocab_size,
         min_frequency=1,
         initial_alphabet=pre_tokenizers.ByteLevel.alphabet(),
         special_tokens=SPECIAL_TOKENS,
     )
     tokenizer.train_from_iterator(training_texts, trainer=trainer)
     actual_vocab_size = tokenizer.get_vocab_size(with_added_tokens=True)
-    if actual_vocab_size != VOCAB_SIZE:
+    if actual_vocab_size != vocab_size:
         raise RuntimeError(
-            f"Expected exactly {VOCAB_SIZE} vocabulary entries, "
+            f"Expected exactly {vocab_size} vocabulary entries, "
             f"but training produced {actual_vocab_size}"
         )
     return tokenizer
