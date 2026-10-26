@@ -6,7 +6,7 @@ Build a Byte Pair Encoding (BPE) tokenizer with one shared vocabulary of 10,000 
 
 ## Results widget
 
-The static widget displays the latest verified Experiment D measurements and provides downloads for the full tokenizer, its complete ID-ordered vocabulary, and the metric/source data:
+The static widget displays the Experiment D baseline measurements and provides downloads for the full tokenizer, its complete ID-ordered vocabulary, and the metric/source data:
 
 - [Open the live widget](https://tokenizerexperiment.netlify.app/)
 - [Open the local widget source](./widget/index.html)
@@ -36,6 +36,23 @@ All experiments use the same full cleaned articles for evaluation.
 
 The raw and cleaned article files are saved under `Assignments/S2/data/` and ignored by Git. Wikipedia's API provides plaintext with markup and references removed; cleaning additionally normalizes Unicode, removes plaintext heading markers, and collapses duplicate whitespace. Bracketed text is preserved.
 
+## Experiment E: reserved Indic-script vocabulary
+
+Run `python Assignments/S2/reserved_vocab_experiment.py` to compare the current Experiment D tokenizer with vocabularies reserving 250, 500, and 1,000 entries for frequent Hindi, Telugu, and Tamil subwords. The reserved entries are allocated as evenly as possible across the three Indic languages and added as ordinary (non-special) tokenizer entries. The rest of the 10,000-entry vocabulary is learned by BPE from the Experiment D training input, weighted 1:2:4:6 for English:Hindi:Telugu:Tamil.
+
+Candidates are NFC substrings of two to five script units found inside words, ranked by frequency in each language's training article. Evaluation uses the same four full cleaned articles and metric as Experiments A-D. The script saves one tokenizer per reservation size as `tokenizer_E-<size>.json` and writes measured scores, per-language ratios, and source revision IDs to `reserved_vocab_results.json`. It does not overwrite Experiment D or the results widget.
+
+The recovered source articles match the revision IDs used for Experiment D, and the saved D tokenizer reproduces its recorded score. All variants below have exactly 10,000 entries.
+
+| Tokenizer | Reserved Indic entries | Ratio gap | Score | English Xᵢ | Hindi Xᵢ | Telugu Xᵢ | Tamil Xᵢ |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| D baseline | 0 | 4.8380 | 206.70 | 2.9259 | 4.8501 | 6.4618 | 7.7639 |
+| E-250 | 250 | 3.2205 | 310.51 | 2.9339 | 4.3254 | 5.7002 | 6.1544 |
+| E-500 | 500 | 2.7043 | 369.79 | 2.9403 | 4.0967 | 5.3525 | 5.6446 |
+| E-1000 | 1,000 | 2.1764 | 459.47 | 2.9651 | 3.9394 | 4.9163 | 5.1415 |
+
+The 1,000-entry variant scores 122% higher than the D baseline on this metric, with the largest fertility reductions in the Indic languages. This is a proposed adaptation, not a result guaranteed by the Brahmic paper. Importantly, the same four article snapshots supply both training and evaluation text, and their frequent substrings determine the reserved entries. The score is therefore a controlled in-sample comparison, not evidence of generalization; test on held-out corpora before claiming a broader improvement.
+
 ## Evaluation
 
 For each language, split the cleaned text on whitespace, encode each distinct form once, and sum those token counts. Forms retain their original case and punctuation.
@@ -52,6 +69,7 @@ Keep the same four cleaned articles for every evaluation. Only change how the sh
 | B | Oversample shorter articles to the longest word count | Reduce article-length bias | Complete |
 | C | Oversample shorter articles to the longest character count | Compare script-sensitive effects | Complete |
 | D | Search language-specific article repetition weights | Reduce the ratio spread | Complete |
+| E | Reserve frequent Indic-script subwords and train the remaining BPE vocabulary | Test script-aware vocabulary allocation | Complete |
 
 Do not assume balanced sampling produces balanced tokenization ratios. Select the strategy with the smallest measured ratio gap.
 
