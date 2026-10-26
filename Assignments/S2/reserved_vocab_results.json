@@ -1,0 +1,180 @@
+{
+  "training_weights": "1:2:4:6 (English:Hindi:Telugu:Tamil)",
+  "vocabulary_size": 10000,
+  "score_formula": "1000 / (max(X_i) - min(X_i))",
+  "reservation_method": "Reserve equally across Hindi, Telugu, and Tamil by adding frequent Indic-script substrings as normal, non-special tokenizer entries; train the remaining BPE vocabulary on weighted article text.",
+  "candidate_method": "Count NFC article substrings of 2-5 script units that occur inside a word; retain candidates with at least two Unicode letters.",
+  "revision_ids": {
+    "en": 1381725259,
+    "hi": 6631096,
+    "te": 4848340,
+    "ta": 4663096
+  },
+  "experiments": [
+    {
+      "label": "D baseline",
+      "vocabulary_size": 10000,
+      "ratio_gap": 4.8380245885746405,
+      "score": 206.69593171592706,
+      "languages": [
+        {
+          "language": "en",
+          "language_name": "English",
+          "token_count": 13579,
+          "unique_word_count": 4641,
+          "ratio": 2.925878043525102
+        },
+        {
+          "language": "hi",
+          "language_name": "Hindi",
+          "token_count": 11684,
+          "unique_word_count": 2409,
+          "ratio": 4.850145288501453
+        },
+        {
+          "language": "te",
+          "language_name": "Telugu",
+          "token_count": 10649,
+          "unique_word_count": 1648,
+          "ratio": 6.461771844660194
+        },
+        {
+          "language": "ta",
+          "language_name": "Tamil",
+          "token_count": 39231,
+          "unique_word_count": 5053,
+          "ratio": 7.763902632099743
+        }
+      ]
+    },
+    {
+      "label": "E-250",
+      "vocabulary_size": 10000,
+      "ratio_gap": 3.2205132810480825,
+      "score": 310.50950973708154,
+      "languages": [
+        {
+          "language": "en",
+          "language_name": "English",
+          "token_count": 13616,
+          "unique_word_count": 4641,
+          "ratio": 2.9338504632622278
+        },
+        {
+          "language": "hi",
+          "language_name": "Hindi",
+          "token_count": 10420,
+          "unique_word_count": 2409,
+          "ratio": 4.325446243254462
+        },
+        {
+          "language": "te",
+          "language_name": "Telugu",
+          "token_count": 9394,
+          "unique_word_count": 1648,
+          "ratio": 5.700242718446602
+        },
+        {
+          "language": "ta",
+          "language_name": "Tamil",
+          "token_count": 31098,
+          "unique_word_count": 5053,
+          "ratio": 6.15436374431031
+        }
+      ],
+      "reserved_token_count": 250,
+      "reserved_tokens_by_language": {
+        "hi": 84,
+        "te": 83,
+        "ta": 83
+      },
+      "tokenizer_file": "tokenizer_E-250.json"
+    },
+    {
+      "label": "E-500",
+      "vocabulary_size": 10000,
+      "ratio_gap": 2.7042529962402835,
+      "score": 369.78788648484357,
+      "languages": [
+        {
+          "language": "en",
+          "language_name": "English",
+          "token_count": 13646,
+          "unique_word_count": 4641,
+          "ratio": 2.940314587373411
+        },
+        {
+          "language": "hi",
+          "language_name": "Hindi",
+          "token_count": 9869,
+          "unique_word_count": 2409,
+          "ratio": 4.096720630967206
+        },
+        {
+          "language": "te",
+          "language_name": "Telugu",
+          "token_count": 8821,
+          "unique_word_count": 1648,
+          "ratio": 5.352548543689321
+        },
+        {
+          "language": "ta",
+          "language_name": "Tamil",
+          "token_count": 28522,
+          "unique_word_count": 5053,
+          "ratio": 5.644567583613695
+        }
+      ],
+      "reserved_token_count": 500,
+      "reserved_tokens_by_language": {
+        "hi": 167,
+        "te": 167,
+        "ta": 166
+      },
+      "tokenizer_file": "tokenizer_E-500.json"
+    },
+    {
+      "label": "E-1000",
+      "vocabulary_size": 10000,
+      "ratio_gap": 2.176406369151506,
+      "score": 459.4730167003969,
+      "languages": [
+        {
+          "language": "en",
+          "language_name": "English",
+          "token_count": 13761,
+          "unique_word_count": 4641,
+          "ratio": 2.9650937297996123
+        },
+        {
+          "language": "hi",
+          "language_name": "Hindi",
+          "token_count": 9490,
+          "unique_word_count": 2409,
+          "ratio": 3.9393939393939394
+        },
+        {
+          "language": "te",
+          "language_name": "Telugu",
+          "token_count": 8102,
+          "unique_word_count": 1648,
+          "ratio": 4.91626213592233
+        },
+        {
+          "language": "ta",
+          "language_name": "Tamil",
+          "token_count": 25980,
+          "unique_word_count": 5053,
+          "ratio": 5.141500098951118
+        }
+      ],
+      "reserved_token_count": 1000,
+      "reserved_tokens_by_language": {
+        "hi": 334,
+        "te": 333,
+        "ta": 333
+      },
+      "tokenizer_file": "tokenizer_E-1000.json"
+    }
+  ]
+}
