@@ -16,4 +16,4 @@ This is a design exercise, not a claim that a model has been trained. The report
 
 ## Status
 
-Research and recommendations are in progress. Final choices and supporting sources will be added here once the evidence has been reviewed.
+The research-backed Medium draft is ready in [S3_medium_post.md](./S3_medium_post.md). Its figures and recommendations are design targets, not experimental results. Review the assumptions and sources before publishing; the draft has not been uploaded to Netlify or Medium.
