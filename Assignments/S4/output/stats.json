@@ -1,0 +1,311 @@
+{
+  "dataset": "ai4bharat/samanantar",
+  "revision": "ead34c5b22a0354d350e7dfdd6aece7df5a48f37",
+  "generated_at_utc": "2026-10-31T22:59:49.402478+00:00",
+  "software": {
+    "python": "3.10.19",
+    "datasets": "4.8.5"
+  },
+  "run_configuration": {
+    "disabled_stages": [],
+    "dedup_threshold": 0.85,
+    "configured_languages": [
+      "as",
+      "bn",
+      "gu",
+      "hi",
+      "kn",
+      "ml",
+      "mr",
+      "or",
+      "pa",
+      "ta",
+      "te"
+    ],
+    "stream_order": [
+      "as",
+      "bn",
+      "gu",
+      "hi",
+      "kn",
+      "ml",
+      "mr",
+      "or",
+      "pa",
+      "ta",
+      "te"
+    ]
+  },
+  "target_tokens": 10000000,
+  "token_definition": "one maximal non-whitespace run, counted in src plus tgt; not a model tokenizer",
+  "slice": {
+    "input_documents": 458258,
+    "input_tokens": 9999995,
+    "output_documents": 457922,
+    "output_tokens": 9982074,
+    "token_budget_note": "input slice stops before the first pair that would exceed target_tokens",
+    "languages": {
+      "as": 936849,
+      "bn": 902842,
+      "gu": 822742,
+      "hi": 1441162,
+      "kn": 685694,
+      "ml": 713663,
+      "mr": 865913,
+      "or": 901630,
+      "pa": 1206020,
+      "ta": 822202,
+      "te": 701278
+    }
+  },
+  "language_split": {
+    "as": {
+      "documents_assigned": 41659,
+      "tokens_assigned": 936845,
+      "output_documents": 41563,
+      "output_tokens": 933287,
+      "script_mismatch_flags": 31
+    },
+    "bn": {
+      "documents_assigned": 41660,
+      "tokens_assigned": 902842,
+      "output_documents": 41641,
+      "output_tokens": 901946,
+      "script_mismatch_flags": 11
+    },
+    "gu": {
+      "documents_assigned": 41660,
+      "tokens_assigned": 822742,
+      "output_documents": 41646,
+      "output_tokens": 822384,
+      "script_mismatch_flags": 10
+    },
+    "hi": {
+      "documents_assigned": 41660,
+      "tokens_assigned": 1441162,
+      "output_documents": 41643,
+      "output_tokens": 1438024,
+      "script_mismatch_flags": 14
+    },
+    "kn": {
+      "documents_assigned": 41660,
+      "tokens_assigned": 685694,
+      "output_documents": 41636,
+      "output_tokens": 685097,
+      "script_mismatch_flags": 4
+    },
+    "ml": {
+      "documents_assigned": 41660,
+      "tokens_assigned": 713663,
+      "output_documents": 41634,
+      "output_tokens": 712909,
+      "script_mismatch_flags": 9
+    },
+    "mr": {
+      "documents_assigned": 41660,
+      "tokens_assigned": 865913,
+      "output_documents": 41645,
+      "output_tokens": 865254,
+      "script_mismatch_flags": 2
+    },
+    "or": {
+      "documents_assigned": 41660,
+      "tokens_assigned": 901630,
+      "output_documents": 41645,
+      "output_tokens": 900927,
+      "script_mismatch_flags": 12
+    },
+    "pa": {
+      "documents_assigned": 41660,
+      "tokens_assigned": 1206020,
+      "output_documents": 41636,
+      "output_tokens": 1204966,
+      "script_mismatch_flags": 13
+    },
+    "ta": {
+      "documents_assigned": 41658,
+      "tokens_assigned": 822198,
+      "output_documents": 41586,
+      "output_tokens": 816759,
+      "script_mismatch_flags": 11
+    },
+    "te": {
+      "documents_assigned": 41659,
+      "tokens_assigned": 701278,
+      "output_documents": 41647,
+      "output_tokens": 700521,
+      "script_mismatch_flags": 16
+    }
+  },
+  "stages": {
+    "boilerplate": {
+      "status": "applied",
+      "input_documents": 458258,
+      "output_documents": 458256,
+      "input_tokens": 9999995,
+      "output_tokens": 9999987,
+      "dropped_documents": 2,
+      "modified_documents": 0,
+      "findings": 0
+    },
+    "unicode": {
+      "status": "applied",
+      "input_documents": 458256,
+      "output_documents": 458256,
+      "input_tokens": 9999987,
+      "output_tokens": 9999987,
+      "dropped_documents": 0,
+      "modified_documents": 68428,
+      "findings": 68428
+    },
+    "special_tags": {
+      "status": "applied",
+      "input_documents": 458256,
+      "output_documents": 458256,
+      "input_tokens": 9999987,
+      "output_tokens": 9999987,
+      "dropped_documents": 0,
+      "modified_documents": 0,
+      "findings": 0
+    },
+    "language_id": {
+      "status": "applied",
+      "input_documents": 458256,
+      "output_documents": 458256,
+      "input_tokens": 9999987,
+      "output_tokens": 9999987,
+      "dropped_documents": 0,
+      "modified_documents": 0,
+      "findings": 133
+    },
+    "quality": {
+      "status": "applied",
+      "input_documents": 458256,
+      "output_documents": 458001,
+      "input_tokens": 9999987,
+      "output_tokens": 9985841,
+      "dropped_documents": 255,
+      "modified_documents": 0,
+      "findings": 268
+    },
+    "decontamination": {
+      "status": "not_run_no_holdout_file",
+      "input_documents": 458001,
+      "output_documents": 458001,
+      "input_tokens": 9985841,
+      "output_tokens": 9985841,
+      "dropped_documents": 0,
+      "modified_documents": 0,
+      "findings": 0
+    },
+    "pii": {
+      "status": "applied",
+      "input_documents": 458001,
+      "output_documents": 458001,
+      "input_tokens": 9985841,
+      "output_tokens": 9984503,
+      "dropped_documents": 0,
+      "modified_documents": 940,
+      "findings": 1685
+    },
+    "minhash_lsh": {
+      "status": "applied",
+      "input_documents": 458001,
+      "output_documents": 457922,
+      "input_tokens": 9984503,
+      "output_tokens": 9982074,
+      "dropped_documents": 79,
+      "modified_documents": 0,
+      "findings": 0
+    }
+  },
+  "deduplication": {
+    "status": "applied",
+    "documents_checked": 458001,
+    "duplicates_removed": 79,
+    "duplicate_rate": 0.00017248870635653635,
+    "rate_definition": "LSH-retrieved rows removed at exact Jaccard >= threshold / rows reaching dedup stage; approximate candidate recall"
+  },
+  "parameters": {
+    "boilerplate": {
+      "patterns": [
+        "\\b(?:enable|accept) cookies to continue\\b",
+        "\\bsubscribe to (?:continue|read)\\b",
+        "\\bthis page requires javascript\\b",
+        "^\\s*(?:cookie policy|privacy policy)\\s*$"
+      ],
+      "action": "drop entire pair on a phrase match"
+    },
+    "unicode": {
+      "form": "NFC",
+      "preserve": [
+        "U+200C ZWNJ",
+        "U+200D ZWJ"
+      ],
+      "whitespace": "unchanged; no whitespace collapse",
+      "scope": "src and tgt fields only"
+    },
+    "special_tags": {
+      "patterns": "\\[(?:/?(?:USER|SYSTEM|ASSISTANT|INST|PROMPT|RESPONSE))\\]|<\\|(?:endoftext|im_start|im_sep|fim_prefix|fim_middle|fim_suffix)\\|>|<extra_id_\\d+>",
+      "action": "remove matched ghost/control spellings; preserve joiners"
+    },
+    "language_id": {
+      "method": "dataset config metadata for target; source is English",
+      "classifier": "not used; no model-based language-ID dependency",
+      "additional_check": "target-script heuristic, mismatch is an audit flag only"
+    },
+    "quality": {
+      "minimum_chars_per_side": 5,
+      "maximum_chars_per_side": 2000,
+      "maximum_single_whitespace_token_chars": 100,
+      "minimum_letter_ratio_for_text_at_least_20_chars": 0.15,
+      "maximum_pair_whitespace_token_ratio": 8,
+      "repeated_character_limit": 10
+    },
+    "pii": {
+      "patterns": {
+        "email": "\\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\\.[A-Z]{2,}\\b",
+        "phone": "(?<!\\w)(?:\\+?\\d[\\d().\\-\\s]{7,}\\d)(?!\\w)"
+      },
+      "replacement": "[EMAIL] / [PHONE]",
+      "counts": {
+        "email": 17,
+        "phone": 1668
+      }
+    },
+    "minhash_lsh": {
+      "threshold": 0.85,
+      "similarity": "exact Jaccard on five-word pair shingles after LSH candidate retrieval",
+      "shingle_hash": "64-bit BLAKE2b",
+      "permutation": "deterministic affine min-hash over 2^61-1",
+      "permutations": 128,
+      "bands": 32,
+      "rows_per_band": 4,
+      "order": "after decontamination and PII replacement"
+    },
+    "decontamination": {
+      "status": "not_run_no_holdout_file",
+      "method": "case-folded whitespace-normalized substring match against supplied holdout lines >=40 chars",
+      "holdout_file": null,
+      "order": "after heuristic quality filtering; before PII replacement and deduplication",
+      "limits": "No benchmark list is bundled; no comprehensive or n-gram overlap claim."
+    }
+  },
+  "quality_reasons": {
+    "extreme_pair_length_ratio": 202,
+    "tgt_repeated_character": 7,
+    "tgt_low_letter_ratio": 42,
+    "tgt_extreme_token": 3,
+    "tgt_over_2000_chars": 6,
+    "src_over_2000_chars": 3,
+    "src_low_letter_ratio": 4,
+    "src_repeated_character": 1
+  },
+  "special_tag_occurrences_removed": 0,
+  "pipeline_notes": [
+    "Input and output token totals count whitespace tokens, not model tokenizer tokens.",
+    "Document totals are sentence pairs because Samanantar is parallel sentence-pair data.",
+    "Language split is dataset-config metadata; script heuristic is not an independent LID classifier.",
+    "Funnel counts use documents surviving each sequential stage; modified-document and finding counts are separate."
+  ]
+}

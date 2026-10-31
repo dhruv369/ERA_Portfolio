@@ -1,0 +1,355 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Explore an explainable Samanantar text-cleaning pipeline and its measured survival funnel.">
+    <title>Samanantar cleaning lab · Session 4</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --ink: #17231f;
+        --muted: #596a62;
+        --paper: #f5f6ef;
+        --card: #fffef9;
+        --line: #d9e2d7;
+        --green: #165b45;
+        --mint: #d5efdc;
+        --orange: #a64e18;
+        --red: #9c2f28;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: radial-gradient(ellipse at 82% 0, #e1efda 0, transparent 34rem), var(--paper);
+        color: var(--ink);
+        font: 16px/1.5 ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      main { width: min(1050px, calc(100% - 32px)); margin: auto; padding: 38px 0 56px; }
+      h1 { margin: 8px 0; font-size: clamp(2.2rem, 6vw, 4.3rem); line-height: 1; letter-spacing: -.05em; }
+      h2 { margin: 0 0 9px; font-size: 1.24rem; }
+      h3 { margin: 0; font-size: 1rem; }
+      p { color: var(--muted); }
+      a { color: var(--green); }
+      .eyebrow { color: var(--green); font-size: .78rem; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+      .intro { max-width: 700px; margin: 0; font-size: 1.08rem; }
+      .panel { margin-top: 16px; padding: 22px; border: 1px solid var(--line); border-radius: 17px; background: var(--card); }
+      .funnel-panel { padding: clamp(18px, 4vw, 32px); }
+      .panel-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 12px; }
+      .panel-heading p { margin: 0; font-size: .9rem; }
+      .notice { margin: 14px 0; padding: 12px 14px; border-left: 4px solid #d48741; background: #fff4e8; color: #614329; }
+      .funnel { display: grid; gap: 10px; margin: 22px 0 8px; }
+      .funnel-row { display: grid; grid-template-columns: minmax(130px, 210px) minmax(100px, 1fr) 120px; align-items: center; gap: 12px; }
+      .funnel-label { font-size: .9rem; font-weight: 700; }
+      .bar-track { height: 23px; overflow: hidden; border-radius: 5px; background: #edf0e9; }
+      .bar { height: 100%; min-width: 2px; border-radius: inherit; background: linear-gradient(90deg, #165b45, #5da878); transition: width .2s ease; }
+      .funnel-value { text-align: right; font-variant-numeric: tabular-nums; font-size: .9rem; }
+      .funnel-value strong { display: block; font-size: 1.04rem; }
+      .funnel-value small { color: var(--muted); }
+      .actions { display: flex; flex-wrap: wrap; gap: 9px; margin-top: 15px; }
+      button {
+        min-height: 44px; padding: 9px 14px; border: 1px solid var(--green);
+        border-radius: 9px; background: var(--green); color: white; font: inherit; font-weight: 700; cursor: pointer;
+      }
+      button.secondary { background: transparent; color: var(--green); }
+      button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 3px solid #dd893b; outline-offset: 3px; }
+      .toggle-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 0; border: 0; }
+      .toggle { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border: 1px solid var(--line); border-radius: 11px; }
+      .toggle input { width: 20px; height: 20px; margin: 1px 0 0; accent-color: var(--green); flex: 0 0 auto; }
+      .toggle p { margin: 4px 0 0; font-size: .86rem; }
+      .sample-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      .sample { padding: 14px; border: 1px solid var(--line); border-radius: 11px; background: #fafbf7; }
+      .sample p { margin: 7px 0 0; font-size: .91rem; overflow-wrap: anywhere; }
+      .sample-label { color: var(--green); font-size: .78rem; font-weight: 800; text-transform: uppercase; letter-spacing: .08em; }
+      .stats-table { width: 100%; border-collapse: collapse; }
+      .stats-table th, .stats-table td { padding: 10px 8px; border-bottom: 1px solid var(--line); text-align: right; }
+      .stats-table th:first-child, .stats-table td:first-child { text-align: left; }
+      .stats-table th { color: var(--muted); font-size: .82rem; }
+      .small { font-size: .88rem; }
+      .error { color: var(--red); }
+      .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+      footer { padding: 22px 2px; color: var(--muted); font-size: .88rem; }
+      @media (max-width: 680px) {
+        main { width: min(100% - 22px, 1050px); padding-top: 25px; }
+        .panel { padding: 17px 13px; }
+        .funnel-row { grid-template-columns: minmax(88px, 1fr) minmax(60px, 1.5fr) 92px; gap: 7px; }
+        .funnel-label, .funnel-value { font-size: .78rem; }
+        .funnel-value strong { font-size: .9rem; }
+        .toggle-list, .sample-grid { grid-template-columns: 1fr; }
+        .stats-table { font-size: .84rem; }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="eyebrow">Session 4 · Indic data quality</div>
+        <h1>Where does text survive?</h1>
+        <p class="intro">An explainable cleaning lab for Samanantar’s English–Indic sentence pairs. The funnel separates documents removed from text that is only normalized, tagged, or scrubbed.</p>
+      </header>
+
+      <section class="panel funnel-panel" aria-labelledby="funnel-title">
+        <div class="panel-heading">
+          <div>
+            <h2 id="funnel-title">Survival funnel</h2>
+            <p id="funnel-caption" aria-live="polite">Loading reproducible run statistics…</p>
+          </div>
+          <button id="show-measured" class="secondary" type="button" hidden>Show measured run</button>
+        </div>
+        <p class="notice" id="funnel-note">The funnel is the number of sentence pairs remaining after each sequential stage; edits and flags are reported separately.</p>
+        <div class="funnel" id="funnel" role="list" aria-label="Survival funnel chart"></div>
+        <div class="actions">
+          <a href="../S4_readme.md">Dataset, license, methodology, and run instructions</a>
+        </div>
+      </section>
+
+      <section class="panel" aria-labelledby="stages-title">
+        <h2 id="stages-title">Toggle the eight strategies</h2>
+        <p class="small">Toggles rerun the clearly labeled illustrative examples below. A real Samanantar run must be rerun with the corresponding <code>--disable</code> option; no browser-side toggle claims to reclean millions of records.</p>
+        <fieldset class="toggle-list" id="toggles">
+          <legend class="sr-only">Cleaning stage toggles</legend>
+        </fieldset>
+      </section>
+
+      <section class="panel" aria-labelledby="preview-title">
+        <div class="panel-heading">
+          <h2 id="preview-title">Illustrative preview</h2>
+          <p>Handcrafted cases · not corpus measurements</p>
+        </div>
+        <p class="small">Preview text is intentionally synthetic. It demonstrates transformations and removals, not the prevalence of any issue in the source dataset.</p>
+        <div class="sample-grid" id="preview" aria-live="polite"></div>
+      </section>
+
+      <section class="panel" id="measured-panel" aria-labelledby="measured-title">
+        <h2 id="measured-title">Run output</h2>
+        <div id="measured">
+          <p>Measured statistics are not included yet. Run the bounded streaming pipeline locally to create <code>output/stats.json</code>; the page will load that file when served from <code>Assignments/S4</code>.</p>
+        </div>
+      </section>
+
+      <footer>
+        Source: <a href="https://huggingface.co/datasets/ai4bharat/samanantar">AI4Bharat Samanantar dataset card</a> ·
+        <a href="https://arxiv.org/abs/2104.05596">Ramesh et al., Samanantar (2021)</a>
+      </footer>
+    </main>
+    <script>
+      const stages = [
+        ["boilerplate", "Boilerplate extraction", "Drop pairs matching a small, explicit web-boilerplate phrase list."],
+        ["unicode", "Unicode NFC", "Canonical NFC only; retain ZWJ/ZWNJ and every whitespace character."],
+        ["special_tags", "Ghost / special tags", "Remove visible control-token spellings; count occurrences."],
+        ["language_id", "Language ID", "Use Samanantar config metadata; script check flags mismatches only."],
+        ["quality", "Heuristic quality", "Conservative length, letter-ratio, extreme-token, and pair-ratio checks."],
+        ["decontamination", "Decontamination", "Only runs if a local holdout file was supplied."],
+        ["pii", "PII scrubbing", "Replace email and phone-pattern matches; report match counts."],
+        ["minhash_lsh", "MinHash + LSH", "Illustration removes exact repeats; measured pipeline uses 128 permutations, 32 × 4 bands/rows, Jaccard 0.85."],
+      ];
+      const ghostPattern = /\[(?:\/?(?:USER|SYSTEM|ASSISTANT|INST|PROMPT|RESPONSE))\]|<\|(?:endoftext|im_start|im_sep|fim_prefix|fim_middle|fim_suffix)\|>|<extra_id_\d+>/gi;
+      const emailPattern = /\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}\b/gi;
+      const phonePattern = /(?<!\w)(?:\+?\d[\d().\-\s]{7,}\d)(?!\w)/g;
+      const demoHoldout = "Illustrative benchmark sentence reserved for a decontamination demonstration.";
+      const demoRows = [
+        { language: "hi", src: "Hello, welcome to the learning lab.", tgt: "नमस्ते, अध्ययन केंद्र में आपका स्वागत है।" },
+        { language: "hi", src: "Subscribe to continue reading", tgt: "अधिक पढ़ें" },
+        { language: "hi", src: "Good morning [USER]", tgt: "नमस्ते <|endoftext|>" },
+        { language: "hi", src: "Contact learner@example.org at +1 555 010 2345", tgt: "संपर्क करें" },
+        { language: "hi", src: "Cafe\u0301 guide today", tgt: "नमस्ते\u200d दुनिया आज" },
+        { language: "ta", src: demoHoldout, tgt: "இந்த எடுத்துக்காட்டு வாக்கியம்." },
+        { language: "hi", src: "Hello, welcome to the learning lab.", tgt: "नमस्ते, अध्ययन केंद्र में आपका स्वागत है।" },
+        { language: "hi", src: "OK", tgt: "ठीक" },
+      ].map((row, id) => ({ ...row, id }));
+      const enabled = Object.fromEntries(stages.map(([id]) => [id, true]));
+      let measuredStats = null;
+      const number = (value) => new Intl.NumberFormat("en").format(value);
+      const escapeHTML = (value) => String(value).replace(/[&<>"']/g, (char) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;",
+      })[char]);
+      const tokens = (text) => (text.match(/\S+/gu) || []).length;
+
+      function qualityReject(row) {
+        for (const text of [row.src, row.tgt]) {
+          const words = text.match(/\S+/gu) || [];
+          const letters = [...text].filter((char) => /\p{L}/u.test(char)).length;
+          if (text.trim().length < 5 || text.length > 2000 ||
+              words.some((word) => word.length > 100) ||
+              (text.length >= 20 && letters / text.length < 0.15) ||
+              /(.)\1{9,}/u.test(text)) return true;
+        }
+        const sourceWords = tokens(row.src);
+        const targetWords = tokens(row.tgt);
+        return Math.min(sourceWords, targetWords) > 0 &&
+          Math.max(sourceWords, targetWords) / Math.min(sourceWords, targetWords) > 8;
+      }
+
+      function hasExpectedScript(text, language) {
+        const ranges = {
+          hi: [0x0900, 0x097f], as: [0x0980, 0x09ff], bn: [0x0980, 0x09ff],
+          gu: [0x0a80, 0x0aff], pa: [0x0a00, 0x0a7f], or: [0x0b00, 0x0b7f],
+          ta: [0x0b80, 0x0bff], te: [0x0c00, 0x0c7f], kn: [0x0c80, 0x0cff],
+          ml: [0x0d00, 0x0d7f], mr: [0x0900, 0x097f],
+        };
+        const range = ranges[language];
+        const letters = [...text].filter((char) => /\p{L}/u.test(char));
+        if (!range || !letters.length) return null;
+        const matches = letters.filter((char) => {
+          const point = char.codePointAt(0);
+          return point >= range[0] && point <= range[1];
+        }).length;
+        return matches / letters.length >= 0.25;
+      }
+
+      function cleanDemo(input) {
+        let rows = input.map((row) => ({ ...row }));
+        const funnel = [{ name: "Input pairs", count: rows.length, stage: null }];
+        const counts = {};
+        for (const [id, label] of stages) {
+          if (enabled[id]) {
+            if (id === "boilerplate") {
+              rows = rows.filter((row) => !/enable cookies to continue|accept cookies to continue|subscribe to (?:continue|read)|this page requires javascript|^\s*(?:cookie policy|privacy policy)\s*$/i.test(`${row.src}\n${row.tgt}`));
+            } else if (id === "unicode") {
+              rows = rows.map((row) => ({ ...row, src: row.src.normalize("NFC"), tgt: row.tgt.normalize("NFC") }));
+            } else if (id === "special_tags") {
+              rows = rows.map((row) => ({ ...row, src: row.src.replace(ghostPattern, ""), tgt: row.tgt.replace(ghostPattern, "") }));
+            } else if (id === "language_id") {
+              rows = rows.map((row) => ({
+                ...row,
+                src_language: "en",
+                target_language: row.language,
+                script_check: hasExpectedScript(row.tgt, row.language),
+              }));
+            } else if (id === "quality") {
+              rows = rows.filter((row) => !qualityReject(row));
+            } else if (id === "pii") {
+              rows = rows.map((row) => ({ ...row, src: row.src.replace(emailPattern, "[EMAIL]").replace(phonePattern, "[PHONE]"), tgt: row.tgt.replace(emailPattern, "[EMAIL]").replace(phonePattern, "[PHONE]") }));
+            } else if (id === "minhash_lsh") {
+              const seen = new Set();
+              rows = rows.filter((row) => {
+                const key = `${row.src.toLocaleLowerCase()} ${row.tgt.toLocaleLowerCase()}`.replace(/\s+/gu, " ").trim();
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+            } else if (id === "decontamination") {
+              rows = rows.filter((row) => !`${row.src} ${row.tgt}`.toLocaleLowerCase().includes(demoHoldout.toLocaleLowerCase()));
+            }
+          }
+          counts[id] = rows.length;
+          funnel.push({ name: label, count: rows.length, stage: id });
+        }
+        return { rows, funnel, counts };
+      }
+
+      function renderFunnel(items, caption, demo) {
+        document.querySelector("#funnel-caption").textContent = caption;
+        document.querySelector("#funnel-note").textContent = demo
+          ? "Illustrative examples only—not Samanantar measurements. Each bar is the remaining number of handcrafted pairs; text edits and flags are not document losses."
+          : "Measured sentence-pair counts from the exact run shown below. Disabled and not-run stages are marked in the table; totals are not estimates.";
+        const max = Math.max(1, ...items.map((item) => item.count));
+        document.querySelector("#funnel").innerHTML = items.map((item, index) => {
+          const previous = index ? items[index - 1].count : item.count;
+          const removed = Math.max(0, previous - item.count);
+          const width = Math.max(item.count ? 1 : 0, item.count / max * 100);
+          return `<div class="funnel-row" role="listitem">
+            <div class="funnel-label">${escapeHTML(item.name)}</div>
+            <div class="bar-track" aria-hidden="true"><div class="bar" style="width:${width}%"></div></div>
+            <div class="funnel-value"><strong>${number(item.count)}</strong><small>${index ? `${number(removed)} removed` : "starting pairs"}</small></div>
+          </div>`;
+        }).join("");
+        document.querySelector("#show-measured").hidden = !demo || !measuredStats;
+      }
+
+      function renderPreview(result) {
+        const source = demoRows;
+        document.querySelector("#preview").innerHTML = source.map((row, index) => {
+          const survivor = result.rows.find((candidate) => candidate.id === index);
+          const current = survivor ? `${survivor.src} / ${survivor.tgt}` : "Removed by an enabled filter";
+          const languageNote = survivor && enabled.language_id
+            ? `Metadata ID: en → ${survivor.target_language}; script check: ${survivor.script_check === null ? "not available" : survivor.script_check ? "expected range present" : "review flag"}`
+            : `Language ID: ${enabled.language_id ? "record removed before this stage" : "disabled"}`;
+          return `<article class="sample">
+            <div class="sample-label">Example ${index + 1} · ${escapeHTML(row.language)}</div>
+            <p><strong>Before:</strong> ${escapeHTML(row.src)} / ${escapeHTML(row.tgt)}</p>
+            <p><strong>After:</strong> ${escapeHTML(current)}</p>
+            <p><strong>${escapeHTML(languageNote)}</strong></p>
+          </article>`;
+        }).join("");
+      }
+
+      function renderDemo() {
+        const result = cleanDemo(demoRows);
+        renderFunnel(result.funnel, "Interactive illustration · 8 handcrafted examples", true);
+        renderPreview(result);
+      }
+
+      function renderMeasured(stats) {
+        const funnelItems = [
+          { name: "Input sentence pairs", count: stats.slice.input_documents },
+          ...stages.map(([id, label]) => ({
+            name: label,
+            count: stats.stages[id].output_documents,
+          })),
+        ];
+        renderFunnel(funnelItems, `Measured run · ${number(stats.slice.input_tokens)} whitespace tokens`, false);
+        const rows = stages.map(([id, label]) => {
+          const stage = stats.stages[id];
+          return `<tr><td>${escapeHTML(label)}</td><td>${escapeHTML(stage.status)}</td><td>${number(stage.input_documents)}</td><td>${number(stage.output_documents)}</td><td>${number(stage.dropped_documents)}</td><td>${number(stage.modified_documents)} / ${number(stage.findings)}</td></tr>`;
+        }).join("");
+        const langRows = Object.entries(stats.language_split)
+          .filter(([, values]) => values.output_documents || values.documents_assigned)
+          .map(([language, values]) => `<tr><td>${escapeHTML(language)}</td><td>${number(values.output_documents)}</td><td>${number(values.output_tokens)}</td><td>${number(values.script_mismatch_flags)}</td></tr>`)
+          .join("");
+        document.querySelector("#measured").innerHTML = `
+          <p>Input: <strong>${number(stats.slice.input_documents)}</strong> sentence pairs · <strong>${number(stats.slice.input_tokens)}</strong> whitespace tokens.
+          Output: <strong>${number(stats.slice.output_documents)}</strong> pairs · <strong>${number(stats.slice.output_tokens)}</strong> whitespace tokens.</p>
+          <p class="small">Revision <code>${escapeHTML(stats.revision)}</code>; configured input budget ${number(stats.target_tokens)} whitespace tokens. Output token count is measured after transformations. This is not a model-token count.</p>
+          <div style="overflow-x:auto"><table class="stats-table"><thead><tr><th>Strategy</th><th>Status</th><th>Input pairs</th><th>Output pairs</th><th>Dropped</th><th>Modified / findings</th></tr></thead><tbody>${rows}</tbody></table></div>
+          <h3 style="margin-top:22px">Output language split</h3>
+          <div style="overflow-x:auto"><table class="stats-table"><thead><tr><th>Config</th><th>Output pairs</th><th>Whitespace tokens</th><th>Script flags</th></tr></thead><tbody>${langRows}</tbody></table></div>
+          <p class="small">Duplicate rate at the LSH candidate-check stage: ${stats.deduplication.duplicate_rate === null ? "not measured" : `${(stats.deduplication.duplicate_rate * 100).toFixed(2)}%`} (${number(stats.deduplication.duplicates_removed)} / ${number(stats.deduplication.documents_checked)} pairs). This rate may miss duplicates not retrieved by LSH. PII matches: ${number(stats.parameters.pii.counts.email || 0)} email patterns, ${number(stats.parameters.pii.counts.phone || 0)} phone patterns. Ghost/special-tag spellings removed: ${number(stats.special_tag_occurrences_removed)}. See generated <code>stats.json</code> for every parameter, quality reason, and limitation.</p>`;
+      }
+
+      function buildToggles() {
+        const fieldset = document.querySelector("#toggles");
+        fieldset.insertAdjacentHTML("beforeend", stages.map(([id, label, description]) => `
+          <label class="toggle" for="toggle-${id}">
+            <input id="toggle-${id}" type="checkbox" checked>
+            <span><strong>${escapeHTML(label)}</strong><p>${escapeHTML(description)}</p></span>
+          </label>`).join(""));
+        fieldset.addEventListener("change", (event) => {
+          if (event.target.matches("input[type=checkbox]")) {
+            enabled[event.target.id.replace("toggle-", "")] = event.target.checked;
+            renderDemo();
+          }
+        });
+      }
+
+      buildToggles();
+      renderDemo();
+      fetch("../output/stats.json").then((response) => {
+        if (!response.ok) throw new Error("No generated stats.json");
+        return response.json();
+      }).then((stats) => {
+        measuredStats = stats;
+        renderMeasured(stats);
+        renderFunnel(
+          [
+            { name: "Input sentence pairs", count: stats.slice.input_documents },
+            ...stages.map(([id, label]) => ({ name: label, count: stats.stages[id].output_documents })),
+          ],
+          `Measured run · ${number(stats.slice.input_tokens)} whitespace tokens`,
+          false
+        );
+        document.querySelector("#show-measured").hidden = false;
+      }).catch(() => {
+        document.querySelector("#funnel-caption").textContent = "Interactive illustration · run pipeline.py to load measured corpus statistics.";
+      });
+      document.querySelector("#show-measured").addEventListener("click", () => {
+        const stats = measuredStats;
+        const funnelItems = [
+          { name: "Input sentence pairs", count: stats.slice.input_documents },
+          ...stages.map(([id, label]) => ({ name: label, count: stats.stages[id].output_documents })),
+        ];
+        renderFunnel(funnelItems, `Measured run · ${number(stats.slice.input_tokens)} whitespace tokens`, false);
+      });
+    </script>
+  </body>
+</html>
