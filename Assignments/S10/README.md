@@ -43,4 +43,8 @@ Write out the bit representation of `0.1` in fp32, bf16, and fp8 E4M3. Explain h
 
 ## Status
 
-The initial `session10.ipynb` foundation is in place: a 108,320-parameter character-level causal Transformer, a self-contained toy corpus, a baseline training loop, tensor-shape output, and a generated sample. In the recorded 500-step run, mean training loss fell from 3.5725 to 0.0806 (validation loss from 3.5701 to 0.0787); the repeated toy corpus makes this a pipeline check, not a generalization result. The required gradient, accumulation, gradient-norm, MFU, and floating-point experiments and their conclusions are still to be completed.
+The `session10.ipynb` foundation includes a 108,320-parameter character-level causal Transformer, a self-contained toy corpus, a baseline training loop, tensor-shape output, and a generated sample. In the recorded 500-step run, mean training loss fell from 3.5725 to 0.0806 (validation loss from 3.5701 to 0.0787); the repeated toy corpus makes this a pipeline check, not a generalization result.
+
+The numerical gradient check compares `lm_head.weight[0, 0]` using a central difference with `epsilon = 0.01` on a fixed batch. The backprop gradient was `-0.00966216`; the finite-difference estimate was `-0.00966787`, an absolute difference of `5.71e-6` (about `0.059%` relative error). The small discrepancy is consistent with finite-precision arithmetic and the finite perturbation size.
+
+The differently weighted micro-batch accumulation, per-step gradient-norm analysis, MFU estimate, and floating-point representation comparison remain to be completed.
