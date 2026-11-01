@@ -43,4 +43,4 @@ Write out the bit representation of `0.1` in fp32, bf16, and fp8 E4M3. Explain h
 
 ## Status
 
-Assignment requirements are recorded; implementation and results are not yet documented.
+The initial `session10.ipynb` foundation is in place: a 108,320-parameter character-level causal Transformer, a self-contained toy corpus, a baseline training loop, tensor-shape output, and a generated sample. In the recorded 500-step run, mean training loss fell from 3.5725 to 0.0806 (validation loss from 3.5701 to 0.0787); the repeated toy corpus makes this a pipeline check, not a generalization result. The required gradient, accumulation, gradient-norm, MFU, and floating-point experiments and their conclusions are still to be completed.
