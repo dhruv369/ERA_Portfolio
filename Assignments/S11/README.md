@@ -71,4 +71,22 @@ The comparison is implemented in [`bias_correction.py`](./bias_correction.py), w
 
 The plot shows parameter values and update magnitudes for the first 20 steps. Bias correction makes a large difference throughout this interval: at step 20, the uncorrected update is `0.06240924` versus `0.01000000` with correction (a `524.09%` relative difference). For a quantitative stopping criterion, define the difference as `abs(update_no_correction - update_with_correction) / abs(update_with_correction)`. It “stops mattering” when this is below `1%` and remains below `1%` for every subsequent step under the same gradient stream. This first occurs at step `3,925` (approximately `0.99997%` difference); therefore the difference does **not** stop mattering within the plotted first 20 steps.
 
-This long settling time is expected with `beta2=0.999`: the uncorrected second moment starts near zero, and its bias decays slowly. The threshold is specific to the stated constant-gradient setup and Adam hyperparameters; changing the gradient sequence or criterion changes the reported step. The remaining experiments—warmup ratios, cosine versus WSD, and learning-rate sweeps across widths—are not yet complete.
+This long settling time is expected with `beta2=0.999`: the uncorrected second moment starts near zero, and its bias decays slowly. The threshold is specific to the stated constant-gradient setup and Adam hyperparameters; changing the gradient sequence or criterion changes the reported step.
+
+### Experiment 3: Update-to-weight ratios during warmup
+
+The experiment is implemented in [`update_weight_ratio.py`](./update_weight_ratio.py). It trains a deterministic `1 -> 32 -> 32 -> 1` tanh MLP on 256 fixed synthetic regression examples for 150 full-batch Adam updates. The learning rate warms linearly from `0.0002` to `0.01` over the first 50 updates, then stays at `0.01`. Adam uses `beta1=0.9`, `beta2=0.999`, `eps=1e-8`, and no weight decay. This small regression setup isolates the optimizer behavior; the ratios should not be read as a language-model result.
+
+For each `Linear` layer, weight and bias are grouped together. At update `t`, the logged ratio is
+
+```text
+||parameters_after_update_t - parameters_before_update_t||_2
+-----------------------------------------------------------------
+                 ||parameters_before_update_t||_2
+```
+
+The script writes all three layer ratios at all 150 updates to [`update_weight_ratio.csv`](./update_weight_ratio.csv) and plots them alongside the learning-rate schedule in [`update_weight_ratio.png`](./update_weight_ratio.png). Training MSE fell from `0.501201` to `0.026967`.
+
+Warmup ends at update `50`, when the learning rate reaches `0.01`; update `51` is the first update that receives no warmup scaling. That marks when the schedule stops changing the learning-rate multiplier, **not** when the observed layerwise ratios become constant. For example, `fc2`'s ratio changes from `0.00704` at update 50 to `0.00670` at update 51, then rises to `0.03143` at update 100 despite a fixed learning rate. Adam's moment estimates and each layer's parameter norm continue evolving, so the ratios are not expected to flatten exactly at the warmup boundary. The plot makes the boundary and this distinction explicit.
+
+The remaining experiments—cosine versus WSD and learning-rate sweeps across widths—are not yet complete.
