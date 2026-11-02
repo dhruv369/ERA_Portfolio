@@ -1,0 +1,5 @@
+stage,parameters_per_rank,gradients_per_rank,optimizer_values_per_rank,parameter_memory_bytes_per_rank,gradient_memory_bytes_per_rank,optimizer_memory_bytes_per_rank,persistent_state_bytes_per_rank,activation_estimate_bytes_per_rank,estimated_total_bytes_per_rank,persistent_state_bytes_aggregate,estimated_total_bytes_aggregate,compute_flops_per_rank_per_step,compute_flops_aggregate_per_step,communication,communication_bytes_sent_per_rank,communication_bytes_sent_aggregate
+ZeRO-0,4353,4353,8706,17412,17412,34824,69648,2064,71712,2228736,2294784,101376,3244032,gradient all-reduce,33735.75,1079544.0
+ZeRO-1,4353,4353,274,17412,17412,1096,35920,2064,37984,1149192,1215240,101376,3244032,gradient all-reduce + updated-parameter all-gather,50603.625,1619316.0
+ZeRO-2,4353,137,274,17412,548,1096,19056,2064,21120,609420,675468,101376,3244032,gradient reduce-scatter + updated-parameter all-gather,33735.75,1079544.0
+ZeRO-3,137,137,274,548,548,1096,2192,2064,4256,69648,135696,101376,3244032,parameter all-gather x2 + gradient reduce-scatter,50603.625,1619316.0
