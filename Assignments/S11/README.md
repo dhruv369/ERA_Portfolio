@@ -65,4 +65,10 @@ Epsilon is added after taking the square root of the bias-corrected second momen
 | 4 | 0.040980000000 | 0.000142357630 | 0.119162547252 | 0.035642836110 | 0.006311805804 | 0.477620533243 |
 | 5 | 0.011882000000 | 0.000204715272 | 0.029015164465 | 0.041025022502 | 0.001432519694 | 0.476188013550 |
 
-The remaining experiments—bias-correction comparison, warmup ratios, cosine versus WSD, and learning-rate sweeps across widths—are not yet complete.
+### Experiment 2: Bias correction
+
+The comparison is implemented in [`bias_correction.py`](./bias_correction.py), which also saves [`bias_correction.png`](./bias_correction.png). It uses the same constant gradient `0.1`, initial weight `1.0`, and Adam settings as the first experiment. The corrected trajectory uses PyTorch Adam; the disabled-correction trajectory uses the same first and second moment recurrences but omits both bias-correction denominators. PyTorch's corrected update is checked against the hand formula on every step.
+
+The plot shows parameter values and update magnitudes for the first 20 steps. Bias correction makes a large difference throughout this interval: at step 20, the uncorrected update is `0.06240924` versus `0.01000000` with correction (a `524.09%` relative difference). For a quantitative stopping criterion, define the difference as `abs(update_no_correction - update_with_correction) / abs(update_with_correction)`. It “stops mattering” when this is below `1%` and remains below `1%` for every subsequent step under the same gradient stream. This first occurs at step `3,925` (approximately `0.99997%` difference); therefore the difference does **not** stop mattering within the plotted first 20 steps.
+
+This long settling time is expected with `beta2=0.999`: the uncorrected second moment starts near zero, and its bias decays slowly. The threshold is specific to the stated constant-gradient setup and Adam hyperparameters; changing the gradient sequence or criterion changes the reported step. The remaining experiments—warmup ratios, cosine versus WSD, and learning-rate sweeps across widths—are not yet complete.
