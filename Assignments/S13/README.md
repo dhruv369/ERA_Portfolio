@@ -39,4 +39,6 @@ Keep the comparisons reproducible. State any settings that differ between runs, 
 
 ## Status
 
-Assignment requirements are recorded; training runs and results are not yet documented.
+The standard baseline notebook and training script are prepared. The baseline uses TinyStories, the GPT-2 tokenizer (without pretrained model weights), a 19.86M-parameter decoder-only Transformer, batch size 16, and sequence length 256. A short GPU/model smoke-test cell runs before any dataset download or training. The training run is designed to process exactly 50 million tokens, with resumable Google Drive checkpoints and measurements for validation loss, throughput, and peak CUDA memory.
+
+The notebook has not yet been run on a Colab GPU. Results are intentionally left unreported until the run completes. The reversible comparisons and maximum-batch run remain to be implemented after the baseline is measured.
