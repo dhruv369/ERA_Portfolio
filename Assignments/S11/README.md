@@ -40,4 +40,29 @@ Tune both sides before accepting a comparison. Record the tuning procedure and s
 
 ## Status
 
-Assignment requirements are recorded; implementation and results are not yet documented.
+The first experiment is implemented in [`adam_by_hand.py`](./adam_by_hand.py). Run it with `python Assignments/S11/adam_by_hand.py`. It computes five Adam updates by hand, compares `m`, `v`, `m_hat`, `v_hat`, the parameter update, and the resulting weight against `torch.optim.Adam`, and asserts that every difference is below `1e-12`.
+
+### Experiment 1: Reproduce one Adam update
+
+The scalar starts at `0.5`; gradients are `[0.2, -0.1, 0.05, 0.3, -0.25]`. Settings are `lr=0.01`, `beta1=0.9`, `beta2=0.999`, `eps=1e-8`, no weight decay, and no AMSGrad. The implementation uses the bias-corrected update
+
+```text
+m_t      = beta1 * m_(t-1) + (1 - beta1) * g_t
+v_t      = beta2 * v_(t-1) + (1 - beta2) * g_t^2
+m_hat_t  = m_t / (1 - beta1^t)
+v_hat_t  = v_t / (1 - beta2^t)
+update_t = lr * m_hat_t / (sqrt(v_hat_t) + eps)
+weight_t = weight_(t-1) - update_t
+```
+
+Epsilon is added after taking the square root of the bias-corrected second moment, matching PyTorch Adam. Hand calculations and PyTorch agree below `1e-12` for all checked moments and parameter values. Representative values:
+
+| Step | `m_t` | `v_t` | `m_hat_t` | `v_hat_t` | Update | Weight after update |
+| ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 1 | 0.020000000000 | 0.000040000000 | 0.200000000000 | 0.040000000000 | 0.009999999500 | 0.490000000500 |
+| 2 | 0.008000000000 | 0.000049960000 | 0.042105263158 | 0.024992496248 | 0.002663370228 | 0.487336630272 |
+| 3 | 0.012200000000 | 0.000052410040 | 0.045018450185 | 0.017487494999 | 0.003404291225 | 0.483932339047 |
+| 4 | 0.040980000000 | 0.000142357630 | 0.119162547252 | 0.035642836110 | 0.006311805804 | 0.477620533243 |
+| 5 | 0.011882000000 | 0.000204715272 | 0.029015164465 | 0.041025022502 | 0.001432519694 | 0.476188013550 |
+
+The remaining experiments—bias-correction comparison, warmup ratios, cosine versus WSD, and learning-rate sweeps across widths—are not yet complete.
