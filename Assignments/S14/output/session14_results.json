@@ -1,0 +1,30 @@
+{
+  "seed": 1401,
+  "task": "piecewise-linear scalar regression",
+  "train_examples": 2048,
+  "validation_examples": 1024,
+  "baseline_steps": 500,
+  "moe_steps_after_conversion": 1500,
+  "baseline_learning_rate": 0.05,
+  "moe_learning_rate": 0.02,
+  "experts": 3,
+  "linear_parameters": 2,
+  "moe_parameters": 12,
+  "max_abs_prediction_error_at_conversion": 1.1920928955078125e-07,
+  "validation_mse_at_conversion": 0.18581444025039673,
+  "validation_mse_after_symmetry_breaking": 0.1842147260904312,
+  "linear_train_mse": 0.1944151222705841,
+  "linear_validation_mse": 0.18581444025039673,
+  "moe_final_train_mse": 0.0011951278429478407,
+  "moe_final_validation_mse": 0.001232014736160636,
+  "validation_mse_reduction_percent": 99.33696502031789,
+  "runtime": {
+    "platform": "macOS-26.5.2-arm64-arm-64bit",
+    "pytorch": "2.14.1",
+    "device": "CPU",
+    "cpu_threads": 1
+  },
+  "figure": "output/linear_to_moe.png",
+  "loss_figure": "output/session14_training_loss.png",
+  "loss_history": "output/session14_loss_history.csv"
+}

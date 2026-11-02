@@ -22,7 +22,7 @@ I learn by building small projects that make the ideas visible and testable. Eac
 | 11 | [Understanding Adam and learning-rate schedules](./Assignments/S11/README.md) | Done |
 | 12 | [Simulating ZeRO across 32 virtual GPUs](./Assignments/S12/README.md) | Done |
 | 13 | [Training a 20M-parameter language model](./Assignments/S13/README.md) | In progress |
-| 14 | [Turning a linear model into an MoE](./Assignments/S14/README.md) | Planned |
+| 14 | [Turning a linear model into an MoE](./Assignments/S14/README.md) | Done |
 | 15 | [Capstone project](./Assignments/S15/README.md) | Planned |
 
 ## Technical skills
