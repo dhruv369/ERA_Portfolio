@@ -89,4 +89,46 @@ The script writes all three layer ratios at all 150 updates to [`update_weight_r
 
 Warmup ends at update `50`, when the learning rate reaches `0.01`; update `51` is the first update that receives no warmup scaling. That marks when the schedule stops changing the learning-rate multiplier, **not** when the observed layerwise ratios become constant. For example, `fc2`'s ratio changes from `0.00704` at update 50 to `0.00670` at update 51, then rises to `0.03143` at update 100 despite a fixed learning rate. Adam's moment estimates and each layer's parameter norm continue evolving, so the ratios are not expected to flatten exactly at the warmup boundary. The plot makes the boundary and this distinction explicit.
 
-The remaining experiments—cosine versus WSD and learning-rate sweeps across widths—are not yet complete.
+### Experiment 4: Cosine versus WSD
+
+The comparison and learning-rate tuning are implemented in [`cosine_vs_wsd.py`](./cosine_vs_wsd.py). It uses the same deterministic `1 -> 32 -> 32 -> 1` tanh MLP and synthetic regression function as the warmup experiment. The 320 ordered input points are split deterministically: every fifth point is validation data (64 points), and the other 256 are used for full-batch training. Each trial starts from the same model initialization (`seed=11`) and uses Adam with `beta1=0.9`, `beta2=0.999`, `eps=1e-8`, and no weight decay.
+
+Both schedules have a 300-update horizon and 30 updates of linear warmup. Cosine then decays from the peak learning rate to zero over updates 31–300. WSD holds the peak rate through update 240, then linearly decays to zero over updates 241–300. As requested, every run is stopped and evaluated after update 200; WSD is therefore still in its stable phase at the stopping point.
+
+To tune both sides rather than compare arbitrary settings, each schedule was run at peak learning rates `0.001`, `0.003`, `0.01`, `0.03`, `0.05`, `0.1`, `0.2`, and `0.3`. We selected each schedule's rate independently using the lowest validation MSE at update 200. This is a small, single-seed grid on a synthetic task, not evidence that these hyperparameters transfer to a larger model.
+
+| Peak LR | Cosine validation MSE | WSD validation MSE |
+| ---: | ---: | ---: |
+| 0.001 | 0.421144 | 0.418021 |
+| 0.003 | 0.317371 | 0.078423 |
+| 0.010 | 0.025841 | 0.008725 |
+| 0.030 | 0.000513 | 0.000443 |
+| 0.050 | 0.001682 | 0.000820 |
+| 0.100 | 0.000423 | 0.000245 |
+| 0.200 | 0.000486 | 0.021413 |
+| 0.300 | 0.000740 | 0.000942 |
+
+| Selected schedule | Peak LR | Train MSE at update 200 | Validation MSE at update 200 |
+| --- | ---: | ---: | ---: |
+| Cosine | 0.1 | 0.00036082 | 0.00042338 |
+| WSD | 0.1 | 0.00024528 | 0.00024450 |
+
+**Decision:** keep the WSD run for this setup. At update 200 its validation MSE is about 42% lower than the tuned cosine run. At that step, cosine has already decayed to a learning rate of about `0.03020`, whereas WSD remains at `0.1`; this result is consistent with WSD's longer stable phase helping on this particular short-horizon comparison. It does not show that WSD is generally better, and because we stop before WSD's decay phase, it is not a comparison of the completed 300-update trajectories.
+
+The script saves the selected loss and learning-rate curves to [`cosine_vs_wsd.png`](./cosine_vs_wsd.png) and every tuning run's per-step train/validation losses and learning rate to [`cosine_vs_wsd.csv`](./cosine_vs_wsd.csv).
+
+### Experiment 5: Learning-rate sweep across widths
+
+The sweep is implemented in [`width_learning_rate_sweep.py`](./width_learning_rate_sweep.py). It trains `1 -> width -> width -> 1` tanh MLPs at widths 256, 512, and 1,024 on the same fixed synthetic regression task and deterministic 256/64 train/validation split. Each run uses full-batch Adam (`beta1=0.9`, `beta2=0.999`, `eps=1e-8`, no weight decay) for 200 updates. We tested 18 learning rates from `0.0001` through `0.1`; each width/rate pair was repeated with five seeds, resetting each seed so rates are compared from matching initializations. The selection metric is the mean validation MSE at update 200; the plot shows the mean and population standard deviation across seeds.
+
+| Width | Selected LR | Mean validation MSE | Population SD |
+| ---: | ---: | ---: | ---: |
+| 256 | 0.015 | 0.003402 | 0.0021 |
+| 512 | 0.008 | 0.011026 | 0.0073 |
+| 1,024 | 0.005 | 0.010072 | 0.0066 |
+
+The minimum of each mean validation-loss curve is marked in [`width_learning_rate_sweep.png`](./width_learning_rate_sweep.png). Per-seed results are recorded in [`width_learning_rate_sweep.csv`](./width_learning_rate_sweep.csv). The best observed rate decreases with width in this setup, although the uncertainty is substantial and neighboring rates have overlapping seed variation.
+
+**Width 4,096 recommendation:** start with learning rate **0.002**, then tune around it. The measured minima decrease from `0.015` to `0.008` to `0.005` as width grows from 256 to 1,024; continuing that rough trend suggests about `0.0015–0.002` at width 4,096. **Confidence is low**: width 4,096 was not tested, this is a small synthetic task with one fixed data split and only five seeds, and the per-seed variation is large relative to several of the measured losses. This is a starting point for a new sweep, not a width-scaling law.
+
+All five experiments are implemented and have reproducible support code. The scripts and artifacts live in this directory; the sweep can be rerun with `python Assignments/S11/width_learning_rate_sweep.py`.
