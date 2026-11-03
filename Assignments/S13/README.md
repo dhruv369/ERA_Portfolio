@@ -41,11 +41,24 @@ Keep the comparisons reproducible. State any settings that differ between runs, 
 
 | Run | Status | Batch size | Training-token budget |
 | --- | --- | ---: | ---: |
-| Standard baseline | Ready; Colab GPU run pending | 16 | 50,000,000 |
+| Standard baseline | Complete | 16 | 50,000,000 |
 | Reversible additive coupling | Ready; Colab GPU run pending | 16 | 50,000,000 |
 | Reversible additive coupling, maximum batch | Ready; Colab GPU run pending | GPU-probed | 50,000,000 |
 
-No final loss, speed, or GPU-memory values are reported yet because the CUDA training runs have not been executed. Each completed script writes a JSON result file containing those measurements; use the notebook's final cell to inspect the files and then copy the measured results here.
+The standard baseline ran on a Colab Tesla T4 with PyTorch `2.11.0+cu130`, CUDA `13.0`, and bfloat16 autocast. It completed all `50,000,000` training tokens in `12,208` steps. The model has `19,863,680` parameters and uses the GPT-2 tokenizer with no pretrained model weights. Training used AdamW (`lr=3e-4`, `weight_decay=0.1`), batch size 16, and sequence length 256.
+
+| Metric | Baseline result |
+| --- | ---: |
+| Final validation loss | 2.046816 |
+| Training tokens | 50,000,000 |
+| Training time (excluding validation/checkpoint time) | 2,930.66 s (48 min 51 s) |
+| Training throughput | 17,061 tokens/s |
+| Peak CUDA memory allocated | 3,007,116,288 bytes (2.801 GiB) |
+| Peak CUDA memory reserved | 3,711,959,040 bytes (3.457 GiB) |
+
+These are the measured baseline results, not estimates. The training token cache was written to Colab local storage (`/content/ERA_Portfolio/Assignments/S13/runs/data/`); checkpoints were written to Google Drive. A disconnected runtime may therefore need to retokenize the dataset before resuming from the Drive checkpoint. The tokenizer's maximum-sequence-length warning came from an individual story exceeding 1,024 tokens; training samples are independently formed at the configured 256-token sequence length.
+
+The fixed-batch reversible and maximum-batch reversible runs remain pending. Compare their final validation loss, throughput, and peak memory against this baseline only after both are complete, noting that the reversible architecture has a slightly different parameter count.
 
 ## Submission
 
