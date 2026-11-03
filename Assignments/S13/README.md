@@ -8,15 +8,21 @@ Train a language model with approximately 20 million parameters for 50 million t
 
 ### 1. Standard baseline
 
-Choose and document a batch size that runs reliably on the selected hardware. Train the model for a 50-million-token budget and record the configuration and results.
+`session13_baseline.py` trains a decoder-only Transformer from random initialization. It uses 3 blocks, width 320, 4 attention heads, tied input/output token embeddings, and has 19,863,680 parameters with the GPT-2 vocabulary. The fixed baseline batch size is 16 sequences of 256 tokens (4,096 tokens per full step).
 
 ### 2. Reversible variant at the fixed batch size
 
-Train again using reversibility with the same batch size and a comparable token budget. Try and report the reversible variant that works for you (for example, midpoint or Euler). Explain which variant you selected and why.
+`session13_reversible.py` uses a 10-block additive reversible-coupling Transformer with 19,257,600 parameters. For each block, `y1 = x1 + F(x2)` and `y2 = x2 + G(y1)`. The backward pass reconstructs `x2 = y2 - G(y1)` and `x1 = y1 - F(x2)`, then recomputes block activations. This is the exact additive-coupling variant, not an Euler or midpoint ODE integrator. Its custom backward was checked against ordinary autograd, including CPU bfloat16 autocast; the coupling inverse was also numerically checked.
+
+The fixed-batch comparison uses batch size 16 and sequence length 256, matching the baseline.
 
 ### 3. Reversible variant at maximum batch size
 
-Train again with the selected reversible variant, increasing the batch size to the maximum that fits the available hardware. Record the largest successful batch size and any constraints or changes required to reach it.
+The notebook invokes the reversible script's `--find-max-batch` option. It probes batch sizes with a full forward/backward/optimizer step and searches for the largest batch that fits the selected GPU. It then trains a separate 50-million-token run at that batch size.
+
+## Colab workflow
+
+Open `session13.ipynb` in Colab with a GPU runtime and run the cells in order. The notebook installs the data/tokenizer packages, mounts Google Drive, stores the Hugging Face cache, tokenized TinyStories data, run checkpoints, and JSON results on Drive, and starts the three runs separately. The token cache is shared, so the TinyStories stream is tokenized only once. Checkpoints are written every 500 steps and runs resume after a disconnect when relaunched with the same configuration. Push the notebook and scripts to GitHub before using the notebook's repository-clone cell.
 
 ## Results to report
 
@@ -31,14 +37,18 @@ For every run, report:
 
 Keep the comparisons reproducible. State any settings that differ between runs, and avoid attributing a result to reversibility or batch size if other changes could explain it.
 
+## Current status and results
+
+| Run | Status | Batch size | Training-token budget |
+| --- | --- | ---: | ---: |
+| Standard baseline | Ready; Colab GPU run pending | 16 | 50,000,000 |
+| Reversible additive coupling | Ready; Colab GPU run pending | 16 | 50,000,000 |
+| Reversible additive coupling, maximum batch | Ready; Colab GPU run pending | GPU-probed | 50,000,000 |
+
+No final loss, speed, or GPU-memory values are reported yet because the CUDA training runs have not been executed. Each completed script writes a JSON result file containing those measurements; use the notebook's final cell to inspect the files and then copy the measured results here.
+
 ## Submission
 
 - Jupyter notebook(s) in the GitHub repository containing the training code, measurements, and analysis.
 - A detailed README documenting the setup, all three runs, results, and conclusions.
 - The GitHub repository link for review.
-
-## Status
-
-The standard baseline notebook and training script are prepared. The baseline uses TinyStories, the GPT-2 tokenizer (without pretrained model weights), a 19.86M-parameter decoder-only Transformer, batch size 16, and sequence length 256. A short GPU/model smoke-test cell runs before any dataset download or training. The training run is designed to process exactly 50 million tokens, with resumable Google Drive checkpoints and measurements for validation loss, throughput, and peak CUDA memory.
-
-The notebook has not yet been run on a Colab GPU. Results are intentionally left unreported until the run completes. The reversible comparisons and maximum-batch run remain to be implemented after the baseline is measured.

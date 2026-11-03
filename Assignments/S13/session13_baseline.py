@@ -14,9 +14,7 @@ from typing import Any
 import numpy as np
 import torch
 import torch.nn.functional as F
-from datasets import load_dataset
 from torch import nn
-from transformers import AutoTokenizer
 
 
 SEED = 1337
@@ -39,7 +37,9 @@ LOG_EVERY_STEPS = 100
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 RUN_DIR = Path(os.environ.get("S13_RUN_DIR", SCRIPT_DIR / "runs" / "baseline"))
-DATA_DIR = RUN_DIR / "data"
+DATA_DIR = Path(
+    os.environ.get("S13_DATA_DIR", SCRIPT_DIR / "runs" / "data")
+)
 CHECKPOINT_DIR = RUN_DIR / "checkpoints"
 CHECKPOINT_PATH = CHECKPOINT_DIR / "latest.pt"
 RESULTS_PATH = RUN_DIR / "baseline_results.json"
@@ -112,8 +112,10 @@ def build_token_cache(
     tokenizer: Any,
     cache_path: Path,
 ) -> np.ndarray:
+    from datasets import load_dataset
+
     if cache_path.exists():
-        cached = np.load(cache_path, mmap_mode="r")
+        cached = np.load(cache_path)
         if len(cached) != token_limit:
             raise RuntimeError(
                 f"{cache_path} has {len(cached):,} tokens; expected {token_limit:,}. "
@@ -155,9 +157,11 @@ def build_token_cache(
         )
 
     cache_path.parent.mkdir(parents=True, exist_ok=True)
-    np.save(cache_path, np.concatenate(chunks))
+    temporary_path = cache_path.with_name(f"{cache_path.stem}.tmp.npy")
+    np.save(temporary_path, np.concatenate(chunks))
+    temporary_path.replace(cache_path)
     print(f"Saved {collected:,} token IDs to {cache_path}")
-    return np.load(cache_path, mmap_mode="r")
+    return np.load(cache_path)
 
 
 def make_batch(
@@ -204,11 +208,17 @@ def evaluate(
     rng = random.Random(SEED + 1)
     loss_sum = 0.0
     counted_tokens = 0
+    tokens_per_batch = min(
+        BATCH_SIZE * SEQUENCE_LENGTH,
+        len(validation_tokens) - 1,
+    )
+    if tokens_per_batch < 1:
+        raise ValueError("The validation token cache must contain at least two tokens.")
     with torch.no_grad():
         for _ in range(EVALUATION_BATCHES):
             x, targets = make_batch(
                 validation_tokens,
-                BATCH_SIZE * SEQUENCE_LENGTH,
+                tokens_per_batch,
                 eos_token_id,
                 device,
                 rng,
@@ -258,6 +268,8 @@ def save_checkpoint(
 
 
 def main(smoke_only: bool = False) -> None:
+    from transformers import AutoTokenizer
+
     if not torch.cuda.is_available():
         raise RuntimeError(
             "A CUDA GPU is required for the full baseline run. In Colab, select "
